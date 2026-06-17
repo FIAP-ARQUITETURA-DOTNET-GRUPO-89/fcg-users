@@ -4,6 +4,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" />
     <PackageReference Include="Divino.OperationResult" />
     <PackageReference Include="MediatR" />
     <PackageReference Include="Riok.Mapperly" />
