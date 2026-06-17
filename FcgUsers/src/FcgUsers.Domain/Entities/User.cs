@@ -55,7 +55,7 @@ public class User : BaseEntity, IAggregateRoot
         Role = newRole;
     }
 
-    public void Inactivate() => IsInactive = true;
+    public void Deactivate() => IsInactive = true;
 
     public bool IsAdmin() => Role == UserRole.Admin;
 

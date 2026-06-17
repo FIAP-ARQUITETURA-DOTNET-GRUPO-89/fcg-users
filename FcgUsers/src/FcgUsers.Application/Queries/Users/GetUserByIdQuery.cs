@@ -1,6 +1,6 @@
-﻿using FcgUsers.Application.Responses.Users;
+﻿using MediatR;
+using FcgUsers.Application.Responses.Users;
 using FcgUsers.SharedKernel.Validators;
-using MediatR;
 using OperationResult;
 
 namespace FcgUsers.Application.Queries.Users;
