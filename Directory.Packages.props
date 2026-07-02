@@ -7,6 +7,7 @@
     <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="13.4.3" />
     <PackageVersion Include="Aspire.Hosting.RabbitMQ" Version="13.4.6" />
     <PackageVersion Include="Aspire.Hosting.Testing" Version="13.4.3" />
+    <PackageVersion Include="BCrypt.Net-Next" Version="4.2.0" />
     <PackageVersion Include="Divino.OperationResult" Version="4.0.1" />
     <PackageVersion Include="FgcGames.EventContracts" Version="0.1.0-preview.2" />
     <PackageVersion Include="FluentValidation" Version="12.1.1" />
