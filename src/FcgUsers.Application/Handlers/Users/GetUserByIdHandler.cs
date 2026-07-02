@@ -2,9 +2,9 @@
 using FcgUsers.Application.Queries.Users;
 using FcgUsers.Application.Mappers.Users;
 using FcgUsers.Application.Responses.Users;
-using FcgUsers.Domain.Repositories;
 using Microsoft.Extensions.Logging;
 using OperationResult;
+using FcgUsers.Domain.Repositories;
 
 namespace FcgUsers.Application.Handlers.Users;
 

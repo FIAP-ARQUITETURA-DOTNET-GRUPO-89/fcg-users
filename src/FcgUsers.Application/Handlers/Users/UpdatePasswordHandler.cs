@@ -1,10 +1,10 @@
 ﻿using MediatR;
 using FcgUsers.Application.Commands.Users;
 using FcgUsers.Application.Responses.Users;
-using FcgUsers.Domain.Repositories;
 using FcgUsers.Domain.ValueObjects;
 using Microsoft.Extensions.Logging;
 using OperationResult;
+using FcgUsers.Domain.Repositories;
 
 namespace FcgUsers.Application.Handlers.Users;
 

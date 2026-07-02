@@ -4,6 +4,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Repositories\Users\" />
     <Folder Include="Services\" />
   </ItemGroup>
 

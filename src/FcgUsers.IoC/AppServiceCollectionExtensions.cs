@@ -1,11 +1,11 @@
-using FluentValidation;
+﻿using FluentValidation;
 using MediatR;
 using FcgUsers.Application;
 using FcgUsers.Domain;
 using FcgUsers.Domain.Repositories.Orders;
 using FcgUsers.Infrastructure.Database;
 using FcgUsers.Infrastructure.Messaging;
-using FcgUsers.Infrastructure.Repositories.Orders;
+//using FcgUsers.Infrastructure.Repositories.Orders;
 using FcgUsers.SharedKernel.Behaviors;
 using FcgUsers.SharedKernel.Settings;
 using Microsoft.EntityFrameworkCore;
