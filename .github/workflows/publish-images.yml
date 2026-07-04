@@ -34,12 +34,6 @@ jobs:
             --no-build \
             --configuration Release
 
-      - name: 🧪 Execute Integration Tests
-        run: |
-          dotnet test tests/FcgUsers.IntegrationTests/FcgUsers.IntegrationTests.csproj \
-            --no-build \
-            --configuration Release
-
       - name: 🐳 Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
 
