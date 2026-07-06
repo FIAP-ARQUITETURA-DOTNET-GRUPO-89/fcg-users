@@ -24,16 +24,15 @@ public static class ConfigureServicesExtensions
                 Description = "Cole somente o token JWT. O prefixo 'Bearer' será adicionado automaticamente."
             });
 
-            // Exatamente como no Projeto 1, passando os parâmetros no construtor
             options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
             {
                 [new OpenApiSecuritySchemeReference("bearer", document)] = []
             });
         });
 
-        // Seus serviços específicos
         services.ConfigureAppDependencies(configuration);
-        services.AddMassTransitRabbitMqPublisher(configuration);
+        //services.AddMassTransitRabbitMqPublisher(configuration);
+        services.AddMassTransitConfig(configuration);
         services.AddHealthChecks().AddDbContextCheck<FcgUsersDbContext>();
     }
 }

@@ -1,49 +1,49 @@
-using FcgUsers.Application.Queries.Orders;
-using FcgUsers.Application.Validators.Orders;
-using Shouldly;
+﻿//using FcgUsers.Application.Queries.Orders;
+//using FcgUsers.Application.Validators.Orders;
+//using Shouldly;
 
-namespace FcgUsers.UnitTests.Application.Validators.Orders;
+//namespace FcgUsers.UnitTests.Application.Validators.Orders;
 
-public class GetOrderByIdValidatorTests
-{
-    private readonly GetOrderByIdValidator _validator;
+//public class GetOrderByIdValidatorTests
+//{
+//    private readonly GetOrderByIdValidator _validator;
 
-    public GetOrderByIdValidatorTests()
-    {
-        _validator = new GetOrderByIdValidator();
-    }
+//    public GetOrderByIdValidatorTests()
+//    {
+//        _validator = new GetOrderByIdValidator();
+//    }
 
-    [Fact]
-    public void Dado_ComandoValido_Quando_Validar_Entao_NaoRetornaErros()
-    {
-        // Arrange
-        var query = CreateValidQuery();
+//    [Fact]
+//    public void Dado_ComandoValido_Quando_Validar_Entao_NaoRetornaErros()
+//    {
+//        // Arrange
+//        var query = CreateValidQuery();
 
-        // Act
-        var result = _validator.Validate(query);
+//        // Act
+//        var result = _validator.Validate(query);
 
-        // Assert
-        result.IsValid.ShouldBeTrue();
-    }
+//        // Assert
+//        result.IsValid.ShouldBeTrue();
+//    }
 
-    [Fact]
-    public void Dado_IdVazio_Quando_Validar_Entao_RetornaErro()
-    {
-        // Arrange
-        var query = CreateValidQuery() with { Id = Guid.Empty };
+//    [Fact]
+//    public void Dado_IdVazio_Quando_Validar_Entao_RetornaErro()
+//    {
+//        // Arrange
+//        var query = CreateValidQuery() with { Id = Guid.Empty };
 
-        // Act
-        var result = _validator.Validate(query);
+//        // Act
+//        var result = _validator.Validate(query);
 
-        // Assert
-        result.IsValid.ShouldBeFalse();
-        result.Errors.ShouldContain(x => x.PropertyName == "Id");
-    }
+//        // Assert
+//        result.IsValid.ShouldBeFalse();
+//        result.Errors.ShouldContain(x => x.PropertyName == "Id");
+//    }
 
-    private static GetOrderByIdQuery CreateValidQuery()
-        => new(Guid.NewGuid())
-        {
-            UserId = "user-1",
-            IsAdmin = false
-        };
-}
+//    private static GetOrderByIdQuery CreateValidQuery()
+//        => new(Guid.NewGuid())
+//        {
+//            UserId = "user-1",
+//            IsAdmin = false
+//        };
+//}

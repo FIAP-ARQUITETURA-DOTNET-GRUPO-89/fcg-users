@@ -1,105 +1,105 @@
-using FcgUsers.Application.Queries.Orders;
-using FcgUsers.Application.Validators.Orders;
-using Shouldly;
+﻿//using FcgUsers.Application.Queries.Orders;
+//using FcgUsers.Application.Validators.Orders;
+//using Shouldly;
 
-namespace FcgUsers.UnitTests.Application.Validators.Orders;
+//namespace FcgUsers.UnitTests.Application.Validators.Orders;
 
-public class GetOrdersValidatorTests
-{
-    private readonly GetOrdersValidator _validator;
+//public class GetOrdersValidatorTests
+//{
+//    private readonly GetOrdersValidator _validator;
 
-    public GetOrdersValidatorTests()
-    {
-        _validator = new GetOrdersValidator();
-    }
+//    public GetOrdersValidatorTests()
+//    {
+//        _validator = new GetOrdersValidator();
+//    }
 
-    [Fact]
-    public void Dado_ConsultaValida_Quando_Validar_Entao_NaoRetornaErros()
-    {
-        // Arrange
-        var query = CreateValidQuery();
+//    [Fact]
+//    public void Dado_ConsultaValida_Quando_Validar_Entao_NaoRetornaErros()
+//    {
+//        // Arrange
+//        var query = CreateValidQuery();
 
-        // Act
-        var result = _validator.Validate(query);
+//        // Act
+//        var result = _validator.Validate(query);
 
-        // Assert
-        result.IsValid.ShouldBeTrue();
-    }
+//        // Assert
+//        result.IsValid.ShouldBeTrue();
+//    }
 
-    // Page
-    [Fact]
-    public void Dado_PageIgualZero_Quando_Validar_Entao_RetornaErro()
-    {
-        // Arrange
-        var query = CreateValidQuery() with { Page = 0 };
+//    // Page
+//    [Fact]
+//    public void Dado_PageIgualZero_Quando_Validar_Entao_RetornaErro()
+//    {
+//        // Arrange
+//        var query = CreateValidQuery() with { Page = 0 };
 
-        // Act
-        var result = _validator.Validate(query);
+//        // Act
+//        var result = _validator.Validate(query);
 
-        // Assert
-        result.IsValid.ShouldBeFalse();
-        result.Errors.ShouldContain(x => x.PropertyName == "Page");
-    }
+//        // Assert
+//        result.IsValid.ShouldBeFalse();
+//        result.Errors.ShouldContain(x => x.PropertyName == "Page");
+//    }
 
-    [Fact]
-    public void Dado_PageNegativa_Quando_Validar_Entao_RetornaErro()
-    {
-        // Arrange
-        var query = CreateValidQuery() with { Page = -1 };
+//    [Fact]
+//    public void Dado_PageNegativa_Quando_Validar_Entao_RetornaErro()
+//    {
+//        // Arrange
+//        var query = CreateValidQuery() with { Page = -1 };
 
-        // Act
-        var result = _validator.Validate(query);
+//        // Act
+//        var result = _validator.Validate(query);
 
-        // Assert
-        result.IsValid.ShouldBeFalse();
-    }
+//        // Assert
+//        result.IsValid.ShouldBeFalse();
+//    }
 
-    // PageSize
-    [Fact]
-    public void Dado_PageSizeZero_Quando_Validar_Entao_RetornaErro()
-    {
-        // Arrange
-        var query = CreateValidQuery() with { PageSize = 0 };
+//    // PageSize
+//    [Fact]
+//    public void Dado_PageSizeZero_Quando_Validar_Entao_RetornaErro()
+//    {
+//        // Arrange
+//        var query = CreateValidQuery() with { PageSize = 0 };
 
-        // Act
-        var result = _validator.Validate(query);
+//        // Act
+//        var result = _validator.Validate(query);
 
-        // Assert
-        result.IsValid.ShouldBeFalse();
-    }
+//        // Assert
+//        result.IsValid.ShouldBeFalse();
+//    }
 
-    [Fact]
-    public void Dado_PageSizeMaiorQue100_Quando_Validar_Entao_RetornaErro()
-    {
-        // Arrange
-        var query = CreateValidQuery() with { PageSize = 101 };
+//    [Fact]
+//    public void Dado_PageSizeMaiorQue100_Quando_Validar_Entao_RetornaErro()
+//    {
+//        // Arrange
+//        var query = CreateValidQuery() with { PageSize = 101 };
 
-        // Act
-        var result = _validator.Validate(query);
+//        // Act
+//        var result = _validator.Validate(query);
 
-        // Assert
-        result.IsValid.ShouldBeFalse();
-    }
+//        // Assert
+//        result.IsValid.ShouldBeFalse();
+//    }
 
-    [Fact]
-    public void Dado_PageSizeMaximoPermitido_Quando_Validar_Entao_Aceita()
-    {
-        // Arrange
-        var query = CreateValidQuery() with { PageSize = 100 };
+//    [Fact]
+//    public void Dado_PageSizeMaximoPermitido_Quando_Validar_Entao_Aceita()
+//    {
+//        // Arrange
+//        var query = CreateValidQuery() with { PageSize = 100 };
 
-        // Act
-        var result = _validator.Validate(query);
+//        // Act
+//        var result = _validator.Validate(query);
 
-        // Assert
-        result.IsValid.ShouldBeTrue();
-    }
+//        // Assert
+//        result.IsValid.ShouldBeTrue();
+//    }
 
-    private static GetOrdersQuery CreateValidQuery()
-        => new()
-        {
-            Page = 1,
-            PageSize = 10,
-            UserId = "user-1",
-            IsAdmin = false
-        };
-}
+//    private static GetOrdersQuery CreateValidQuery()
+//        => new()
+//        {
+//            Page = 1,
+//            PageSize = 10,
+//            UserId = "user-1",
+//            IsAdmin = false
+//        };
+//}

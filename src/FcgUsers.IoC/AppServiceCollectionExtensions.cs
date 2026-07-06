@@ -1,15 +1,16 @@
-﻿using FluentValidation;
-using MediatR;
-using FcgUsers.Application;
+﻿using FcgUsers.Application;
+using FcgUsers.Application.Interfaces;
 using FcgUsers.Domain;
 using FcgUsers.Domain.Repositories;
+//using FcgUsers.Domain.Repositories.Orders;
 using FcgUsers.Infrastructure.Database;
-using FcgUsers.Infrastructure.Messaging;
+//using FcgUsers.Infrastructure.Messaging;
 using FcgUsers.Infrastructure.Repositories;
 using FcgUsers.Infrastructure.Services;
-using FcgUsers.Application.Interfaces;
 using FcgUsers.SharedKernel.Behaviors;
 using FcgUsers.SharedKernel.Settings;
+using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,7 +41,7 @@ public static class AppServiceCollectionExtensions
                 npgsql => npgsql.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(10), errorCodesToAdd: null)));
 
         // MassTransit
-        services.AddMassTransitRabbitMqPublisher(configuration);
+        //services.AddMassTransitRabbitMqPublisher(configuration);
 
         // Repositories
         services.AddScoped<IUserRepository, UserRepository>();

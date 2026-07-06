@@ -1,4 +1,4 @@
-﻿using FcgUsers.Domain.Events; // Onde seu evento reside
+﻿using FcgUsers.Domain.Events;
 using MassTransit;
 using MediatR;
 
