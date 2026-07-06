@@ -9,41 +9,29 @@ public static class ConfigureServicesExtensions
 {
     public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddAuthentication();
+        services.AddAuthorization();
         services.AuthnAuthzConfig();
-        services.AddEndpointsApiExplorer();
 
+        services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(options =>
         {
-            var securityScheme = new OpenApiSecurityScheme
+            options.AddSecurityDefinition("bearer", new OpenApiSecurityScheme
             {
-                Name = "Authorization",
-                Description = "Entre com o token JWT (ex: Bearer {token})",
-                In = ParameterLocation.Header,
                 Type = SecuritySchemeType.Http,
                 Scheme = "bearer",
-                BearerFormat = "JWT"
-            };
+                BearerFormat = "JWT",
+                Description = "Cole somente o token JWT. O prefixo 'Bearer' será adicionado automaticamente."
+            });
 
-            options.AddSecurityDefinition("bearer", securityScheme);
-
-            // Em vez de usar Reference = new OpenApiReference que está falhando,
-            // usamos um OpenApiSecurityRequirement que associa o esquema pelo ID.
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            // Exatamente como no Projeto 1, passando os parâmetros no construtor
+            options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
             {
-                {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
-                        {
-                            Id = "bearer",
-                            Type = ReferenceType.SecurityScheme
-                        }
-                    },
-                    new List<string>()
-                }
+                [new OpenApiSecuritySchemeReference("bearer", document)] = []
             });
         });
 
+        // Seus serviços específicos
         services.ConfigureAppDependencies(configuration);
         services.AddMassTransitRabbitMqPublisher(configuration);
         services.AddHealthChecks().AddDbContextCheck<FcgUsersDbContext>();
