@@ -2,6 +2,8 @@
 using FcgUsers.Application.Mappers.Users;
 using FcgUsers.Application.Responses.Users;
 using FcgUsers.Domain.Repositories;
+using FcgUsers.Domain.Events;
+using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using OperationResult;
@@ -10,7 +12,8 @@ namespace FcgUsers.Application.Handlers.Users;
 
 public sealed partial class CreateUserHandler(
     IUserRepository userRepository,
-    ILogger<CreateUserHandler> logger)
+    ILogger<CreateUserHandler> logger,
+    IPublishEndpoint publishEndpoint)
 : IRequestHandler<CreateUserCommand, Result<CreateUserResponse>>
 {
     public async Task<Result<CreateUserResponse>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
@@ -25,8 +28,16 @@ public sealed partial class CreateUserHandler(
         }
 
         var user = request.ToEntity();
+
         userRepository.Add(user);
         await userRepository.SaveChangesAsync();
+
+        await publishEndpoint.Publish(new UserCreatedEvent(
+            user.Id,
+            user.Name,
+            user.Email.Address,
+            DateTime.UtcNow),
+            cancellationToken);
 
         LogUserCreated(logger, user.Id, user.Email.Address);
 

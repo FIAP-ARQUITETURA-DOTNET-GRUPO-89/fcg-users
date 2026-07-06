@@ -1,4 +1,4 @@
-using FcgUsers.Api.Endpoints;
+﻿using FcgUsers.Api.Endpoints; // Verifique se este namespace contém seus endpoints de usuários
 using FcgUsers.Api.Middlewares;
 using FcgUsers.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +22,6 @@ public static class AppConfigureExtensions
             });
 
             using var scope = app.Services.CreateScope();
-
             var db = scope.ServiceProvider.GetRequiredService<FcgUsersDbContext>();
             if (db.Database.IsRelational())
             {
@@ -33,7 +32,8 @@ public static class AppConfigureExtensions
         app.UseAuthentication();
         app.UseAuthorization();
 
-        app.MapOrdersEndpoints();
+        // Mapeie os seus endpoints de Usuários aqui
+        app.MapUsersEndpoints();
 
         app.MapHealthChecks("/health");
         app.MapHealthChecks("/ready");

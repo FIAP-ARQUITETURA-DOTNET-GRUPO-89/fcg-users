@@ -1,26 +1,37 @@
-﻿using FcgUsers.Api.Extensions; // Onde está o seu ConfigureServices
+﻿using FcgUsers.Api.Endpoints;
+using FcgUsers.Api.Extensions;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Configuração de Logging
+// 1. Logging
 builder.Host.UseSerilog((context, services, configuration) =>
 {
-    configuration
-        .ReadFrom.Configuration(context.Configuration)
-        .ReadFrom.Services(services)
-        .Enrich.FromLogContext();
+    configuration.ReadFrom.Configuration(context.Configuration)
+                 .ReadFrom.Services(services)
+                 .Enrich.FromLogContext();
 });
 
-// 2. Configuração centralizada de todos os serviços (incluindo nossa nova Infra)
+// 2. Centralização de serviços (Inclui Auth, Swagger, MassTransit, Dependências)
 builder.Services.ConfigureServices(builder.Configuration);
 
 var app = builder.Build();
 
-// 3. Configuração do Pipeline da aplicação
+// 3. Pipeline
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 app.UseHttpsRedirection();
+
+// Importante: Authentication antes de Authorization
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers();
+
+// 4. Mapeamento
+app.MapAuthEndpoints();
+app.MapUsersEndpoints();
 
 app.Run();

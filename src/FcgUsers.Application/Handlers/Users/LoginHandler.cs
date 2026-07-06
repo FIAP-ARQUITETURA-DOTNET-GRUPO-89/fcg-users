@@ -16,25 +16,25 @@ public sealed partial class LoginHandler(
 {
     public async Task<Result<LoginResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        LogLoginAttempt(logger, request.Email);
+        LogLoginAttempt(logger, request.UserEmail.Address);
 
         var user = await userRepository.GetByEmailAsync(request.UserEmail.Address);
 
         if (user is null)
         {
-            LogLoginFailedUserNotFound(logger, request.Email);
+            LogLoginFailedUserNotFound(logger, request.UserEmail.Address);
             return Result.Error<LoginResponse>(new UnauthorizedAccessException("Credenciais inválidas."));
         }
 
         if (user.IsInactive)
         {
-            LogLoginFailedUserInactive(logger, request.Email);
+            LogLoginFailedUserInactive(logger, request.UserEmail.Address);
             return Result.Error<LoginResponse>(new UnauthorizedAccessException("Credenciais inválidas."));
         }
 
         if (!BCrypt.Net.BCrypt.Verify(request.Password, user.Password.Hash))
         {
-            LogLoginFailedInvalidPassword(logger, request.Email);
+            LogLoginFailedInvalidPassword(logger, request.UserEmail.Address);
             return Result.Error<LoginResponse>(new UnauthorizedAccessException("Credenciais inválidas."));
         }
 
