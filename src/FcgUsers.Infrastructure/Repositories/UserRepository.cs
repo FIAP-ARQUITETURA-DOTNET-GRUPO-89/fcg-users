@@ -18,8 +18,14 @@ public class UserRepository(FcgUsersDbContext context) : BaseRepository<User>(co
         int page, int pageSize, bool active, CancellationToken ct = default)
     {
         var query = _context.Set<User>().Where(u => u.IsInactive != active);
+
         var total = await query.CountAsync(ct);
-        var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync(ct);
+
+        var items = await query.OrderBy(u => u.Name)
+                               .Skip((page - 1) * pageSize)
+                               .Take(pageSize)
+                               .ToListAsync(ct);
+
         return (items, total);
     }
 
@@ -28,7 +34,12 @@ public class UserRepository(FcgUsersDbContext context) : BaseRepository<User>(co
     {
         var query = _context.Set<User>().Where(u => u.Name.Contains(name));
         var total = await query.CountAsync(ct);
-        var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync(ct);
+
+        var items = await query.OrderBy(u => u.Name)
+                               .Skip((page - 1) * pageSize)
+                               .Take(pageSize)
+                               .ToListAsync(ct);
+
         return (items, total);
     }
 }

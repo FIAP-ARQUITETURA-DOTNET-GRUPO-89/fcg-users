@@ -1,13 +1,20 @@
 ﻿namespace FcgUsers.Domain.ValueObjects;
 
-public record Email(string Address)
+public record Email
 {
-    protected Email() : this(string.Empty) { }
+    public string Address { get; }
+
+    private Email(string address) => Address = address;
 
     public static Email Create(string address)
     {
-        if (string.IsNullOrWhiteSpace(address) || !address.Contains("@"))
+        if (string.IsNullOrWhiteSpace(address) ||
+            !address.Contains("@") ||
+            address.Trim().StartsWith("@") ||
+            address.Trim().EndsWith("@"))
+        {
             throw new ArgumentException("E-mail inválido.");
+        }
 
         return new Email(address.ToLower().Trim());
     }

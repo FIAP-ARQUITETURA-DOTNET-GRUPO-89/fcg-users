@@ -1,4 +1,4 @@
-﻿using FcgUsers.Application.Commands.Users;
+﻿using FcgUsers.Application.Commands;
 using FcgUsers.Application.Responses.Users;
 using FgcGames.Api.Filters;
 using MediatR;
