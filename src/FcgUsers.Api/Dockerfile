@@ -14,7 +14,7 @@ COPY global.json .
 COPY Directory.Build.props .
 COPY Directory.Packages.props .
 
-# Arquivos de projeto (melhora o aproveitamento do cache do Docker)
+# Copia apenas os arquivos de projeto (melhora o cache)
 COPY src/FcgUsers.Api/FcgUsers.Api.csproj src/FcgUsers.Api/
 COPY src/FcgUsers.Application/FcgUsers.Application.csproj src/FcgUsers.Application/
 COPY src/FcgUsers.Domain/FcgUsers.Domain.csproj src/FcgUsers.Domain/
@@ -23,19 +23,16 @@ COPY src/FcgUsers.IoC/FcgUsers.IoC.csproj src/FcgUsers.IoC/
 COPY src/FcgUsers.ServiceDefaults/FcgUsers.ServiceDefaults.csproj src/FcgUsers.ServiceDefaults/
 COPY src/FcgUsers.SharedKernel/FcgUsers.SharedKernel.csproj src/FcgUsers.SharedKernel/
 
-# Restaura as dependências
+# Restore
 RUN dotnet restore src/FcgUsers.Api/FcgUsers.Api.csproj
 
-# Copia o restante do código-fonte
+# Copia todo o restante do código
 COPY . .
 
-WORKDIR /src/src/FcgUsers.Api
-
-# Publica a aplicação
-RUN dotnet publish \
+# Publish
+RUN dotnet publish src/FcgUsers.Api/FcgUsers.Api.csproj \
     -c $BUILD_CONFIGURATION \
     -o /app/publish \
-    --no-restore \
     /p:UseAppHost=false
 
 ########################################
@@ -47,13 +44,12 @@ RUN apt-get update && apt-get install -y \
     libgssapi-krb5-2 \
     krb5-locales \
     && rm -rf /var/lib/apt/lists/*
-    
+
 WORKDIR /app
 
-# Executa como usuário não-root
 USER $APP_UID
 
-EXPOSE 7072
+EXPOSE 7071
 
 COPY --from=build /app/publish .
 
