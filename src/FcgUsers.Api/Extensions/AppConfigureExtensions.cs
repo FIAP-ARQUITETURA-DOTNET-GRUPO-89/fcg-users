@@ -1,4 +1,4 @@
-using FcgUsers.Api.Endpoints;
+﻿using FcgUsers.Api.Endpoints;
 using FcgUsers.Api.Middlewares;
 using FcgUsers.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +20,13 @@ public static class AppConfigureExtensions
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
                 c.RoutePrefix = "";
             });
+        }
 
+        var runMigration = app.Environment.IsDevelopment() ||
+                           (app.Environment.IsProduction() && Environment.GetEnvironmentVariable("RUN_MIGRATION") == "true");
+
+        if (runMigration)
+        {
             using var scope = app.Services.CreateScope();
 
             var db = scope.ServiceProvider.GetRequiredService<FcgUsersDbContext>();
