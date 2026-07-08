@@ -1,4 +1,4 @@
-﻿using FcgUsers.Application.Queries.Users;
+﻿using FcgUsers.Application.Queries;
 using FcgUsers.Application.Validators;
 using FluentValidation.TestHelper;
 

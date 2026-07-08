@@ -1,5 +1,5 @@
 ﻿using FcgUsers.Application.Handlers.Users;
-using FcgUsers.Application.Queries.Users;
+using FcgUsers.Application.Queries;
 using FcgUsers.Domain.Entities;
 using FcgUsers.Domain.Enums;
 using FcgUsers.Domain.Repositories;

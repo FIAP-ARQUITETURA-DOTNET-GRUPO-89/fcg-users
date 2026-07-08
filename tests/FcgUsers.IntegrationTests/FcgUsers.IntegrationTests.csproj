@@ -25,6 +25,7 @@
     <ProjectReference Include="..\..\src\FcgUsers.AppHost\FcgUsers.AppHost.csproj" />
     <ProjectReference Include="..\..\src\FcgUsers.Application\FcgUsers.Application.csproj" />
     <ProjectReference Include="..\..\src\FcgUsers.Infrastructure\FcgUsers.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\FcgUsers.Worker\FcgUsers.Worker.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿using FcgUsers.Application.Commands.Users;
+﻿using FcgUsers.Application.Commands;
 using FcgUsers.Application.Handlers.Users;
 using FcgUsers.Domain.Entities;
 using FcgUsers.Domain.Enums;

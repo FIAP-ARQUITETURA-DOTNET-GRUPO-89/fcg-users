@@ -1,92 +1,92 @@
-﻿//using Aspire.Hosting;
-//using Aspire.Hosting.Testing;
-//using FcgUsers.Infrastructure.Database;
-//using FcgUsers.IntegrationTests.TestHelpers;
-//using FcgUsers.SharedKernel.Settings;
-//using Microsoft.EntityFrameworkCore;
-//using Microsoft.Extensions.DependencyInjection;
+﻿using Aspire.Hosting;
+using Aspire.Hosting.Testing;
+using FcgUsers.Infrastructure.Database;
+using FcgUsers.IntegrationTests.TestHelpers;
+using FcgUsers.SharedKernel.Settings;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
-//namespace FcgUsers.IntegrationTests.Fixtures;
+namespace FcgUsers.IntegrationTests.Fixtures;
 
-///// <summary>
-///// Fixture base para testes de integração da aplicação.
-///// Essa classe atua como ponto central de orquestração da infraestrutura de testes.
-///// </summary>
-//public class IntegrationTestFixture : IAsyncLifetime
-//{
-//    public DistributedApplication App { get; private set; } = default!;
+/// <summary>
+/// Fixture base para testes de integração da aplicação.
+/// Essa classe atua como ponto central de orquestração da infraestrutura de testes.
+/// </summary>
+public class IntegrationTestFixture : IAsyncLifetime
+{
+    public DistributedApplication App { get; private set; } = default!;
 
-//    private TestDatabaseManager _dbManager = default!;
-//    private string _connectionString = string.Empty;
+    private TestDatabaseManager _dbManager = default!;
+    private string _connectionString = string.Empty;
 
-//    /// <summary>
-//    /// Inicializa o ambiente de testes.
-//    /// </summary>
-//    public async ValueTask InitializeAsync()
-//    {
-//        Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", "Testing");
+    /// <summary>
+    /// Inicializa o ambiente de testes.
+    /// </summary>
+    public async ValueTask InitializeAsync()
+    {
+        Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", "Testing");
 
-//        var builder = await DistributedApplicationTestingBuilder
-//            .CreateAsync<Projects.FcgUsers_AppHost>();
+        var builder = await DistributedApplicationTestingBuilder
+            .CreateAsync<Projects.FcgUsers_AppHost>();
 
-//        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddHttpContextAccessor();
 
-//        builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
-//        builder.Services.AddSingleton<JwtTestTokenGenerator>();
+        builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+        builder.Services.AddSingleton<JwtTestTokenGenerator>();
 
-//        builder.Services.ConfigureHttpClientDefaults(client =>
-//        {
-//            client.ConfigurePrimaryHttpMessageHandler(() =>
-//                new HttpClientHandler
-//                {
-//                    ServerCertificateCustomValidationCallback =
-//                        HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-//                });
-//        });
+        builder.Services.ConfigureHttpClientDefaults(client =>
+        {
+            client.ConfigurePrimaryHttpMessageHandler(() =>
+                new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback =
+                        HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                });
+        });
 
-//        App = await builder.BuildAsync();
-//        await App.StartAsync();
+        App = await builder.BuildAsync();
+        await App.StartAsync();
 
-//        _connectionString = await App.GetConnectionStringAsync("Default") ?? throw new InvalidOperationException("Connection string não encontrada");
-//        _dbManager = new TestDatabaseManager(_connectionString);
-//        await _dbManager.InitializeAsync();
-//        await _dbManager.ResetAsync();
-//    }
+        _connectionString = await App.GetConnectionStringAsync("Default") ?? throw new InvalidOperationException("Connection string não encontrada");
+        _dbManager = new TestDatabaseManager(_connectionString);
+        await _dbManager.InitializeAsync();
+        await _dbManager.ResetAsync();
+    }
 
-//    /// <summary>
-//    /// Finaliza a execução da aplicação após os testes.
-//    /// </summary>
-//    public async ValueTask DisposeAsync()
-//    {
-//        if (App is not null)
-//        {
-//            await App.StopAsync();
-//            await App.DisposeAsync();
-//        }
-//    }
+    /// <summary>
+    /// Finaliza a execução da aplicação após os testes.
+    /// </summary>
+    public async ValueTask DisposeAsync()
+    {
+        if (App is not null)
+        {
+            await App.StopAsync();
+            await App.DisposeAsync();
+        }
+    }
 
-//    /// <summary>
-//    /// Reseta o banco de dados para um estado limpo.
-//    /// </summary>
-//    public async Task ResetDatabaseAsync()
-//        => await _dbManager.ResetAsync();
+    /// <summary>
+    /// Reseta o banco de dados para um estado limpo.
+    /// </summary>
+    public async Task ResetDatabaseAsync()
+        => await _dbManager.ResetAsync();
 
-//    /// <summary>
-//    /// Cria um HttpClient configurado para comunicação com a API.
-//    /// </summary>
-//    public HttpClient CreateClient()
-//        => App.CreateHttpClient("fcgusers-api", endpointName: "https");
+    /// <summary>
+    /// Cria um HttpClient configurado para comunicação com a API.
+    /// </summary>
+    public HttpClient CreateClient()
+        => App.CreateHttpClient("fcgusers-api", endpointName: "https");
 
-//    /// <summary>
-//    /// Executa uma função isolada utilizando um <see cref="FcgUsersDbContext"/> apontando para o banco de testes.
-//    /// </summary>
-//    public async Task<T> ExecuteDbContextAsync<T>(Func<FcgUsersDbContext, Task<T>> action)
-//    {
-//        var options = new DbContextOptionsBuilder<FcgUsersDbContext>()
-//            .UseNpgsql(_connectionString)
-//            .Options;
+    /// <summary>
+    /// Executa uma função isolada utilizando um <see cref="FcgUsersDbContext"/> apontando para o banco de testes.
+    /// </summary>
+    public async Task<T> ExecuteDbContextAsync<T>(Func<FcgUsersDbContext, Task<T>> action)
+    {
+        var options = new DbContextOptionsBuilder<FcgUsersDbContext>()
+            .UseNpgsql(_connectionString)
+            .Options;
 
-//        await using var context = new FcgUsersDbContext(options);
-//        return await action(context);
-//    }
-//}
+        await using var context = new FcgUsersDbContext(options);
+        return await action(context);
+    }
+}

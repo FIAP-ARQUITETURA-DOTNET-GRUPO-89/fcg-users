@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using OperationResult;
 using FcgUsers.Domain.Repositories;
 using FcgUsers.Application.Queries;
+using FcgUsers.SharedKernel.Exceptions;
 
 namespace FcgUsers.Application.Handlers.Users;
 
@@ -22,7 +23,7 @@ public sealed partial class GetUserByIdHandler(
         if (user is null)
         {
             LogUserNotFound(logger, request.Id);
-            return Result.Error<UserResponse>(new KeyNotFoundException($"Usuário com o ID {request.Id} não foi encontrado."));
+            return Result.Error<UserResponse>(new NotFoundException($"Usuário com o ID {request.Id} não foi encontrado."));
         }
 
         LogFetchUserByIdSuccess(logger, user.Id);
