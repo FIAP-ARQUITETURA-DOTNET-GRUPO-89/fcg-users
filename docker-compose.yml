@@ -1,5 +1,4 @@
 services:
-
   postgres:
     image: postgres:17
     container_name: fcgusers-postgres
@@ -48,10 +47,10 @@ services:
       rabbitmq:
         condition: service_healthy
     ports:
-      - "7072:7072"
+      - "7010:7010"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: http://+:7072
+      ASPNETCORE_URLS: http://+:7010
       ConnectionStrings__Default: Host=postgres;Port=5432;Database=fcgusers;Username=fcgusers;Password=fcgusers
       ConnectionStrings__Rabbitmq: amqp://guest:guest@rabbitmq:5672
       JwtSettings__Issuer: FcgUsers-Issuer
