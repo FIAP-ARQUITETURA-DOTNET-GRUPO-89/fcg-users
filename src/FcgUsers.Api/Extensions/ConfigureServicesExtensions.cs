@@ -1,5 +1,4 @@
 ﻿using FcgUsers.Infrastructure.Database;
-using FcgUsers.Infrastructure.Messaging;
 using FcgUsers.IoC;
 using Microsoft.OpenApi;
 
@@ -31,8 +30,6 @@ public static class ConfigureServicesExtensions
         });
 
         services.ConfigureAppDependencies(configuration);
-        //services.AddMassTransitRabbitMqPublisher(configuration);
-        services.AddMassTransitConfig(configuration);
         services.AddHealthChecks().AddDbContextCheck<FcgUsersDbContext>();
     }
 }

@@ -4,6 +4,8 @@ using FcgUsers.Domain;
 using FcgUsers.Domain.Repositories;
 //using FcgUsers.Domain.Repositories.Orders;
 using FcgUsers.Infrastructure.Database;
+using FcgUsers.Infrastructure.Messaging;
+
 //using FcgUsers.Infrastructure.Messaging;
 using FcgUsers.Infrastructure.Repositories;
 using FcgUsers.Infrastructure.Services;
@@ -41,7 +43,7 @@ public static class AppServiceCollectionExtensions
                 npgsql => npgsql.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(10), errorCodesToAdd: null)));
 
         // MassTransit
-        //services.AddMassTransitRabbitMqPublisher(configuration);
+        services.AddMassTransitRabbitMqPublisher(configuration);
 
         // Repositories
         services.AddScoped<IUserRepository, UserRepository>();

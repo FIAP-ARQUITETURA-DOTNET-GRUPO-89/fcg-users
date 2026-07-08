@@ -29,7 +29,7 @@ public static class ConfigureServicesExtensions
     {
         services.ConfigureWorkerDependencies(configuration);
 
-        services.AddMassTransitConfig(configuration, x =>
+        services.AddMassTransitRabbitMq(configuration, x =>
         {
             x.AddConsumer<UserCreatedConsumer>();
         });

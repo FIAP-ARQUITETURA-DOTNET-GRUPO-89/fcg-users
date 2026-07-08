@@ -37,8 +37,6 @@
 //host.Run();
 
 
-using FcgUsers.Infrastructure.Messaging;
-using FcgUsers.Worker.Consumers;
 using Serilog;
 
 var builder = Host.CreateApplicationBuilder(args);
@@ -54,11 +52,6 @@ builder.Services.AddSerilog((services, configuration) =>
 builder.AddServiceDefaults();
 
 builder.Services.ConfigureServices(builder.Configuration);
-
-builder.Services.AddMassTransitConfig(builder.Configuration, x =>
-{
-    x.AddConsumer<UserCreatedConsumer>();
-});
 
 var host = builder.Build();
 
