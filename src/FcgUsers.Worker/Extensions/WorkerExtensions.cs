@@ -1,6 +1,5 @@
 ﻿using FcgUsers.Worker.Consumers;
 using MassTransit;
-
 namespace FcgUsers.Worker.Extensions;
 
 public static class WorkerExtensions
@@ -9,7 +8,6 @@ public static class WorkerExtensions
     {
         services.AddMassTransit(x =>
         {
-            // Registra os consumidores localizados neste projeto
             x.AddConsumer<UserCreatedConsumer>();
 
             x.UsingRabbitMq((context, cfg) =>

@@ -4,6 +4,7 @@ using FcgUsers.Domain.Entities;
 using FcgUsers.Domain.Enums;
 using FcgUsers.Domain.Repositories;
 using FcgUsers.Domain.ValueObjects;
+using FcgUsers.SharedKernel.Exceptions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Shouldly;
@@ -59,7 +60,7 @@ public class GetUserByIdHandlerTests
 
         // Assert
         result.IsSuccess.ShouldBeFalse();
-        result.Exception.ShouldBeOfType<KeyNotFoundException>();
+        result.Exception.ShouldBeOfType<NotFoundException>();
         result.Exception.Message.ShouldBe($"Usuário com o ID {userId} não foi encontrado.");
 
         await _userRepository.Received(1).GetByIdAsync(userId);

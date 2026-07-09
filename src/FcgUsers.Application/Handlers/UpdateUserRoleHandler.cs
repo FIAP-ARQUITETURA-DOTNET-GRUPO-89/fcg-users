@@ -34,7 +34,9 @@ public sealed partial class UpdateUserRoleHandler(
         if (user.Role == UserRole.Admin && newRole == UserRole.User)
         {
             LogAdminDemotionBlocked(logger, user.Id);
-            return Result.Error<UpdateUserRoleResponse>(new InvalidOperationException("Não é permitido rebaixar um administrador para usuário padrão por este fluxo."));
+            // Use o método que aceita a mensagem diretamente, ou 
+            // se o seu Result exige uma Exception, use uma que o Middleware ignore.
+            return Result.Error<UpdateUserRoleResponse>(new InvalidOperationException("Não é permitido rebaixar um administrador."));
         }
 
         user.ChangeRole(newRole);
@@ -44,7 +46,6 @@ public sealed partial class UpdateUserRoleHandler(
         LogRoleUpdatedSuccess(logger, user.Id, user.Role.ToString());
 
         var response = user.ToUpdateRoleResponse("Nível de acesso atualizado com sucesso!");
-
         return Result.Success(response);
     }
 

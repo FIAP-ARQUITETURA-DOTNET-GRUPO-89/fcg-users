@@ -51,18 +51,20 @@ public class UpdateUserIntegrationTests(IntegrationTestFixture fixture) : IAsync
     public async Task Dado_Admin_Quando_TentarRebaixarParaUser_Entao_DeveRetornarBadRequest()
     {
         // Arrange
-        var client = TestAuthHelper.CreateAdminClientAsync(_fixture).Result;
-        var adminId = Guid.NewGuid();
+        var client = await TestAuthHelper.CreateAdminClientAsync(_fixture);
 
-        await _fixture.ExecuteDbContextAsync<bool>(async db => {
-            var admin = new User("Admin", new DateOnly(1990, 1, 1), Email.Create("admin@teste.com"), Password.FromHash("Password123!"), UserRole.Admin);
-            typeof(User).GetProperty("Id")?.SetValue(admin, adminId);
+        // Captura o ID gerado pelo banco
+        var adminId = await _fixture.ExecuteDbContextAsync<Guid>(async db => {
+            var admin = new User("Admin", new DateOnly(1990, 1, 1),
+                Email.Create("admin@teste.com"),
+                Password.FromHash("Password123!"),
+                UserRole.Admin);
             db.Users.Add(admin);
             await db.SaveChangesAsync();
-            return true;
+            return admin.Id; // Retorna o ID real salvo
         });
 
-        var command = new { Id = adminId, RoleName = "User" };
+        var command = new { RoleName = "User" }; // O ID já está na URL
 
         // Act
         var response = await client.PatchAsJsonAsync($"/api/users/{adminId}/role", command);

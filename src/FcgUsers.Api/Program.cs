@@ -1,11 +1,11 @@
 ﻿using FcgUsers.Api.Endpoints;
 using FcgUsers.Api.Extensions;
+using FcgUsers.Api.Middlewares;
 using FcgUsers.Infrastructure.Extensions;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Logging
 builder.Host.UseSerilog((context, services, configuration) =>
 {
     configuration.ReadFrom.Configuration(context.Configuration)
@@ -13,15 +13,14 @@ builder.Host.UseSerilog((context, services, configuration) =>
                  .Enrich.FromLogContext();
 });
 
-// 2. Serviços (Atenção: verifique se ConfigureServices não chama o MassTransit internamente)
 builder.Services.ConfigureServices(builder.Configuration);
-
-// 3. Configuração de Mensageria (Apenas Publisher)
 builder.Services.AddMassTransitRabbitMqPublisher(builder.Configuration);
 
 var app = builder.Build();
 
-// 4. Pipeline
+// Middleware no topo
+app.UseMiddleware<ExceptionMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -32,7 +31,6 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// 5. Mapeamento
 app.MapAuthEndpoints();
 app.MapUsersEndpoints();
 

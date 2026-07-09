@@ -59,7 +59,7 @@ public static class UsersEndpoints
             .AddEndpointFilter<ValidationFilter<UpdateUserRoleCommand>>()
             .WithSummary("Atualiza a role de um usuário")
             .Produces<UpdateUserRoleResponse>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status404NotFound);
+            .Produces(StatusCodes.Status400BadRequest);
 
         group.MapPatch("/{id:guid}/password", UpdatePassword)
             .RequireAuthorization()
@@ -114,8 +114,16 @@ public static class UsersEndpoints
 
     private static async Task<IResult> UpdateUserRole(Guid id, UpdateUserRoleCommand command, IMediator mediator)
     {
+        // Se a regra de negócio for validada AQUI, o middleware nem vê a exceção.
         var result = await mediator.Send(command with { Id = id });
-        return result.IsSuccess ? Results.Ok(result.Value) : CreateNotFoundProblem(id);
+
+        if (!result.IsSuccess)
+        {
+            // Retorno manual e forçado do status 400
+            return Results.BadRequest(new { message = result.Exception?.Message });
+        }
+
+        return Results.Ok(result.Value);
     }
 
     private static async Task<IResult> UpdatePassword(Guid id, UpdatePasswordCommand command, IMediator mediator)

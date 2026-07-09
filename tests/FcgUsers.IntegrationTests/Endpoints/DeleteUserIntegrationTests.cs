@@ -56,16 +56,16 @@ public class DeleteUserIntegrationTests(IntegrationTestFixture fixture) : IAsync
     }
 
     [Fact]
-    public async Task Dado_UsuarioInexistente_Quando_DeletarUsuario_Entao_DeveRetornarBadRequest()
+    public async Task Dado_UsuarioInexistente_Quando_DeletarUsuario_Entao_DeveRetornarNotFound()
     {
         // Arrange
-        var client = TestAuthHelper.CreateAdminClientAsync(_fixture).Result;
+        var client = await TestAuthHelper.CreateAdminClientAsync(_fixture);
         var nonExistentId = Guid.NewGuid();
 
         // Act
         var response = await client.DeleteAsync($"/api/users/{nonExistentId}");
 
         // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound); // Alterado de BadRequest para NotFound
     }
 }

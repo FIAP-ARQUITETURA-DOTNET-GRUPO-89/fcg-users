@@ -16,31 +16,24 @@ public class UserCreatedConsumerTests(IntegrationTestFixture fixture) : IAsyncLi
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
     [Fact]
-    public async Task Dado_EventoUserCreated_Quando_Consumido_Entao_DeveProcessarComSucesso()
+    public async Task Dado_EventoUserCreated_Quando_Publicado_Entao_DeveSerProcessadoPeloConsumer()
     {
         // Arrange
         var harness = _fixture.App.Services.GetRequiredService<ITestHarness>();
+        await harness.Start(); // Garante que o harness iniciou
 
         var userId = Guid.NewGuid();
-        var email = "test@example.com";
-        var name = "Nome Teste";
-
-        // Criando o evento com os 4 parâmetros exigidos pelo seu record
-        var message = new UserCreatedEvent(
-            userId,
-            name,
-            email,
-            DateTime.UtcNow
-        );
+        var message = new UserCreatedEvent(userId, "Nome Teste", "test@example.com", DateTime.UtcNow);
 
         // Act
         await harness.Bus.Publish(message);
 
-        // Assert 1: Valida se a mensagem foi entregue ao barramento
+        // Assert
+        // Verifica se foi consumido pelo barramento
         var consumed = await harness.Consumed.Any<UserCreatedEvent>();
         consumed.ShouldBeTrue("O evento UserCreatedEvent não foi consumido pelo barramento.");
 
-        // Assert 2: Valida se o consumidor específico (UserCreatedConsumer) foi invocado
+        // Verifica o consumidor especificamente
         var consumerHarness = harness.GetConsumerHarness<UserCreatedConsumer>();
         var consumedByConsumer = await consumerHarness.Consumed.Any<UserCreatedEvent>();
         consumedByConsumer.ShouldBeTrue("O UserCreatedConsumer não processou o evento.");
