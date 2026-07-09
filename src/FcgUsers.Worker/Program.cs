@@ -37,10 +37,12 @@
 //host.Run();
 
 
+//using FcgUsers.Worker.Extensions;
 using Serilog;
 
 var builder = Host.CreateApplicationBuilder(args);
 
+// 1. Logging
 builder.Services.AddSerilog((services, configuration) =>
 {
     configuration
@@ -49,9 +51,12 @@ builder.Services.AddSerilog((services, configuration) =>
         .Enrich.FromLogContext();
 });
 
+// 2. Defaults (Infrastructure)
 builder.AddServiceDefaults();
-
 builder.Services.ConfigureServices(builder.Configuration);
+
+// 3. Configuração de Mensageria (Publisher + Consumers)
+//builder.Services.AddMassTransitWithConsumers(builder.Configuration);
 
 var host = builder.Build();
 
