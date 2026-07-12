@@ -114,12 +114,10 @@ public static class UsersEndpoints
 
     private static async Task<IResult> UpdateUserRole(Guid id, UpdateUserRoleCommand command, IMediator mediator)
     {
-        // Se a regra de negócio for validada AQUI, o middleware nem vê a exceção.
         var result = await mediator.Send(command with { Id = id });
 
         if (!result.IsSuccess)
         {
-            // Retorno manual e forçado do status 400
             return Results.BadRequest(new { message = result.Exception?.Message });
         }
 

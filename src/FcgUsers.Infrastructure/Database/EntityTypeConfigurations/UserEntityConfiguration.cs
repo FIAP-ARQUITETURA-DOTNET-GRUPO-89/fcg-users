@@ -25,7 +25,6 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<User>
                .IsRequired()
                .HasColumnType("date");
 
-        // Configuração do ValueObject Email
         builder.OwnsOne(x => x.Email, email =>
         {
             email.Property(e => e.Address)

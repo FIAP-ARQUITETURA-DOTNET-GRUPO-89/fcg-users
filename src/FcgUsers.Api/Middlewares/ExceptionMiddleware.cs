@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using FluentValidation; // Importante
+using FluentValidation;
 
 namespace FcgUsers.Api.Middlewares;
 
@@ -11,13 +11,12 @@ public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddlewa
         {
             await next(context);
         }
-        catch (ValidationException ex) // Adicione este bloco!
+        catch (ValidationException ex)
         {
             logger.LogWarning("Erro de validação: {Message}", ex.Message);
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
             context.Response.ContentType = "application/problem+json";
 
-            // Retorna os detalhes dos erros de validação
             var problem = new ValidationProblemDetails(
                 ex.Errors.GroupBy(e => e.PropertyName)
                           .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray())

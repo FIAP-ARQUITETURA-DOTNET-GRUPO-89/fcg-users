@@ -34,8 +34,6 @@ public sealed partial class UpdateUserRoleHandler(
         if (user.Role == UserRole.Admin && newRole == UserRole.User)
         {
             LogAdminDemotionBlocked(logger, user.Id);
-            // Use o método que aceita a mensagem diretamente, ou 
-            // se o seu Result exige uma Exception, use uma que o Middleware ignore.
             return Result.Error<UpdateUserRoleResponse>(new InvalidOperationException("Não é permitido rebaixar um administrador."));
         }
 

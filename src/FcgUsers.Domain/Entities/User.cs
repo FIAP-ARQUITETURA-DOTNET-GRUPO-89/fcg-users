@@ -1,7 +1,6 @@
 ﻿using FcgUsers.Domain.Enums;
 using FcgUsers.Domain.Interfaces;
 using FcgUsers.Domain.ValueObjects;
-//using FcgUsers.SharedKernel.Domain;
 
 namespace FcgUsers.Domain.Entities;
 

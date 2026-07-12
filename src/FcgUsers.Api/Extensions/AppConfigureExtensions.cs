@@ -1,4 +1,4 @@
-﻿using FcgUsers.Api.Endpoints; // Verifique se este namespace contém seus endpoints de usuários
+﻿using FcgUsers.Api.Endpoints;
 using FcgUsers.Api.Middlewares;
 using FcgUsers.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
@@ -32,7 +32,6 @@ public static class AppConfigureExtensions
         app.UseAuthentication();
         app.UseAuthorization();
 
-        // Mapeie os seus endpoints de Usuários aqui
         app.MapUsersEndpoints();
 
         app.MapHealthChecks("/health");

@@ -5,7 +5,6 @@ using FcgUsers.Infrastructure.Database;
 using FcgUsers.Infrastructure.Services;
 using FcgUsers.IntegrationTests.TestHelpers;
 using FcgUsers.SharedKernel.Settings;
-using FcgUsers.Worker.Consumers;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,7 +24,6 @@ public class IntegrationTestFixture : IAsyncLifetime
 
         var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.FcgUsers_AppHost>();
 
-        // Força a leitura do appsettings.Testing.json na pasta do projeto de testes
         var configPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.Testing.json");
         builder.Configuration.AddJsonFile(configPath, optional: false, reloadOnChange: true);
 
@@ -35,7 +33,6 @@ public class IntegrationTestFixture : IAsyncLifetime
 
         builder.Services.AddMassTransitTestHarness(x =>
         {
-            x.AddConsumer<UserCreatedConsumer>();
             x.UsingInMemory((context, cfg) => cfg.ConfigureEndpoints(context));
         });
 

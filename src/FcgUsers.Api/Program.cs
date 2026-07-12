@@ -1,7 +1,7 @@
 ﻿using FcgUsers.Api.Endpoints;
 using FcgUsers.Api.Extensions;
 using FcgUsers.Api.Middlewares;
-using FcgUsers.Infrastructure.Extensions;
+using FcgUsers.Infrastructure.Messaging;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,7 +18,6 @@ builder.Services.AddMassTransitRabbitMqPublisher(builder.Configuration);
 
 var app = builder.Build();
 
-// Middleware no topo
 app.UseMiddleware<ExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())

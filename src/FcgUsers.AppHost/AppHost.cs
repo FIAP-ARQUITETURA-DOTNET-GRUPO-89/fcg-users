@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -22,17 +22,10 @@ var rabbitmq = isTesting
         .WithLifetime(ContainerLifetime.Persistent);
 
 builder.AddProject<Projects.FcgUsers_Api>("fcgusers-api")
-        .WithEnvironment("ASPNETCORE_ENVIRONMENT", builder.Environment.EnvironmentName)
-        .WithReference(postgres)
-        .WithReference(rabbitmq)
-        .WaitFor(postgres)
-        .WaitFor(rabbitmq);
-
-builder.AddProject<Projects.FcgUsers_Worker>("fcgusers-worker")
-        .WithEnvironment("ASPNETCORE_ENVIRONMENT", builder.Environment.EnvironmentName)
-        .WithReference(postgres)
-        .WithReference(rabbitmq)
-        .WaitFor(postgres)
-        .WaitFor(rabbitmq);
+    .WithEnvironment("ASPNETCORE_ENVIRONMENT", builder.Environment.EnvironmentName)
+    .WithReference(postgres)
+    .WithReference(rabbitmq)
+    .WaitFor(postgres)
+    .WaitFor(rabbitmq);
 
 builder.Build().Run();
