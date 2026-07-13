@@ -9,7 +9,10 @@ public static class TestDataSeeder
 {
     public static async Task SeedAsync(FcgUsersDbContext context)
     {
-        if (context.Users.Any()) return;
+        if (context.Users.Any())
+        {
+            return;
+        }
 
         var user = new User(
             "Usuário Teste Integrado",

@@ -34,12 +34,11 @@ public class CreateUserIntegrationTests(IntegrationTestFixture fixture) : IAsync
         };
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/users", command);
+        var response = await client.PostAsJsonAsync("/api/users", command, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
 
-        // Verifica persistência no banco real
         await _fixture.ExecuteDbContextAsync<bool>(async db =>
         {
             var user = await db.Users.FirstOrDefaultAsync(u => u.Email.Address == "testuser@example.com");
@@ -82,7 +81,7 @@ public class CreateUserIntegrationTests(IntegrationTestFixture fixture) : IAsync
         };
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/users", command);
+        var response = await client.PostAsJsonAsync("/api/users", command, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);

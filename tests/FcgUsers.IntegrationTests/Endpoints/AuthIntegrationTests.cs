@@ -40,12 +40,12 @@ public class AuthIntegrationTests(IntegrationTestFixture fixture) : IAsyncLifeti
         var command = new { Email = email, Password = passwordRaw };
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/auth/login", command);
+        var response = await client.PostAsJsonAsync("/api/auth/login", command, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
-        var content = await response.Content.ReadFromJsonAsync<object>();
+        var content = await response.Content.ReadFromJsonAsync<object>(cancellationToken: TestContext.Current.CancellationToken);
         content.ShouldNotBeNull();
     }
 
@@ -57,7 +57,7 @@ public class AuthIntegrationTests(IntegrationTestFixture fixture) : IAsyncLifeti
         var command = new { Email = "naoexiste@teste.com", Password = "WrongPassword!" };
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/auth/login", command);
+        var response = await client.PostAsJsonAsync("/api/auth/login", command, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);

@@ -20,7 +20,7 @@ public class DeleteUserIntegrationTests(IntegrationTestFixture fixture) : IAsync
     public async Task Dado_UsuarioExistente_Quando_DeletarUsuario_Entao_DeveDesativarNoBanco()
     {
         // Arrange
-        var client = TestAuthHelper.CreateAdminClientAsync(_fixture).Result;
+        var client = await TestAuthHelper.CreateAdminClientAsync(_fixture);
         var userId = Guid.NewGuid();
 
         await _fixture.ExecuteDbContextAsync<bool>(async db =>
@@ -41,7 +41,7 @@ public class DeleteUserIntegrationTests(IntegrationTestFixture fixture) : IAsync
         });
 
         // Act
-        var response = await client.DeleteAsync($"/api/users/{userId}");
+        var response = await client.DeleteAsync($"/api/users/{userId}", TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -63,9 +63,9 @@ public class DeleteUserIntegrationTests(IntegrationTestFixture fixture) : IAsync
         var nonExistentId = Guid.NewGuid();
 
         // Act
-        var response = await client.DeleteAsync($"/api/users/{nonExistentId}");
+        var response = await client.DeleteAsync($"/api/users/{nonExistentId}", TestContext.Current.CancellationToken);
 
         // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.NotFound); // Alterado de BadRequest para NotFound
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 }

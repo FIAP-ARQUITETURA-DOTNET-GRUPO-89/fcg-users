@@ -22,7 +22,7 @@ public class UserRepositoryTests
         await repository.SaveChangesAsync();
 
         using var assertContext = InMemoryDbContextFactory.CreateContext(connection);
-        var result = await assertContext.Users.FindAsync(user.Id);
+        var result = await assertContext.Users.FindAsync([user.Id], TestContext.Current.CancellationToken);
         result.ShouldNotBeNull();
         result.Name.ShouldBe("Iago Pachiani");
     }
@@ -39,11 +39,11 @@ public class UserRepositoryTests
             CreateUser("Usuario 3", "u3@teste.com"),
             CreateUser("Usuario 4", "u4@teste.com")
         );
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
         var repository = new UserRepository(context);
 
         // Act
-        var (items, total) = await repository.GetPagedAsync(page: 2, pageSize: 2, active: true);
+        var (items, total) = await repository.GetPagedAsync(page: 2, pageSize: 2, active: true, ct: TestContext.Current.CancellationToken);
 
         // Assert
         items.Count.ShouldBe(2);

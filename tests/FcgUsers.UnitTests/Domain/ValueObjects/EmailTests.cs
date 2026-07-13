@@ -21,13 +21,12 @@ public class EmailTests
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
-    [InlineData("emailinvalido")] // Não tem @
-    [InlineData("usuario@")]         // Termina com @
-    [InlineData("@teste.com")]    // Começa com @
+    [InlineData("emailinvalido")]
+    [InlineData("usuario@")]
+    [InlineData("@teste.com")]
     public void Dado_EmailInvalido_Quando_Criar_Entao_LancaExcecao(string address)
     {
         // Act & Assert
-        // A forma correta de capturar a exceção com Shouldly para um método estático:
         Should.Throw<ArgumentException>(() => Email.Create(address));
     }
 }

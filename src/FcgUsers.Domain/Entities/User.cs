@@ -6,7 +6,6 @@ namespace FcgUsers.Domain.Entities;
 
 public class User : BaseEntity, IAggregateRoot
 {
-    public DateTime CreatedAt { get; private set; }
     public string Name { get; private set; } = string.Empty;
     public DateOnly BirthDate { get; private set; }
     public Email Email { get; private set; }
@@ -35,10 +34,14 @@ public class User : BaseEntity, IAggregateRoot
     public void UpdateProfile(string name, DateOnly birthDate)
     {
         if (string.IsNullOrWhiteSpace(name))
+        {
             throw new ArgumentException("Name cannot be empty.");
+        }
 
         if (birthDate > DateOnly.FromDateTime(DateTime.Now))
+        {
             throw new ArgumentException("Birth date cannot be a future date.");
+        }
 
         Name = name;
         BirthDate = birthDate;
@@ -62,7 +65,11 @@ public class User : BaseEntity, IAggregateRoot
     {
         var today = DateOnly.FromDateTime(DateTime.Now);
         var age = today.Year - BirthDate.Year;
-        if (BirthDate > today.AddYears(-age)) age--;
+        if (BirthDate > today.AddYears(-age))
+        {
+            age--;
+        }
+
         return age;
     }
 }
