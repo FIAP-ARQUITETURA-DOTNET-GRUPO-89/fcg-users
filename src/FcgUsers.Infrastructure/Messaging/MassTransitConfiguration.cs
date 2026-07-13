@@ -1,21 +1,58 @@
-﻿using MassTransit;
+﻿using FcgUsers.SharedKernel.Settings;
+using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace FcgUsers.Infrastructure.Messaging;
 
 public static class MassTransitConfiguration
 {
+    /// <summary>
+    /// Configura o MassTransit para consumo e publicação de eventos, incluindo registro de consumers, filas e endpoints do RabbitMQ.
+    /// Deve ser utilizado por Workers ou serviços que consumam mensagens.
+    /// </summary>
+    public static IServiceCollection AddMassTransitRabbitMq(this IServiceCollection services, IConfiguration configuration, Action<IBusRegistrationConfigurator> configureConsumers)
+    {
+        services.AddMassTransit(x =>
+        {
+            configureConsumers(x);
+
+            x.UsingRabbitMq((context, cfg) =>
+            {
+                var connectionString = configuration.GetConnectionString("rabbitmq") ?? configuration["RabbitMQ:Host"];
+
+                cfg.Host(connectionString);
+
+                var retry = context.GetRequiredService<IOptions<MassTransitSettings>>().Value;
+
+                cfg.UseMessageRetry(r =>
+                {
+                    r.Exponential(
+                        retryLimit: retry.RetryLimit,
+                        minInterval: TimeSpan.FromSeconds(retry.MinIntervalSeconds),
+                        maxInterval: TimeSpan.FromSeconds(retry.MaxIntervalSeconds),
+                        intervalDelta: TimeSpan.FromSeconds(retry.IntervalDeltaSeconds));
+                });
+
+                cfg.ConfigureEndpoints(context);
+            });
+        });
+
+        return services;
+    }
+
+    /// <summary>
+    /// Configura o MassTransit apenas para publicação de eventos.
+    /// Deve ser utilizado por APIs ou serviços que apenas enviam mensagens para o broker e não possuem consumers.
+    /// </summary>
     public static IServiceCollection AddMassTransitRabbitMqPublisher(this IServiceCollection services, IConfiguration configuration)
     {
-        if (services.Any(s => s.ServiceType == typeof(IBus))) return services;
-
         services.AddMassTransit(x =>
         {
             x.UsingRabbitMq((context, cfg) =>
             {
-                var connectionString = configuration.GetConnectionString("rabbitmq")
-                    ?? throw new InvalidOperationException("A ConnectionString 'rabbitmq' não foi encontrada.");
+                var connectionString = configuration.GetConnectionString("rabbitmq");
 
                 cfg.Host(connectionString);
             });

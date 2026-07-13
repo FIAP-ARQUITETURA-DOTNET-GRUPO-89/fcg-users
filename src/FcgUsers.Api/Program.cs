@@ -1,10 +1,9 @@
-﻿using FcgUsers.Api.Endpoints;
-using FcgUsers.Api.Extensions;
-using FcgUsers.Api.Middlewares;
-using FcgUsers.Infrastructure.Messaging;
+﻿using FcgUsers.Api.Extensions;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddServiceDefaults();
 
 builder.Host.UseSerilog((context, services, configuration) =>
 {
@@ -14,23 +13,9 @@ builder.Host.UseSerilog((context, services, configuration) =>
 });
 
 builder.Services.ConfigureServices(builder.Configuration);
-builder.Services.AddMassTransitRabbitMqPublisher(builder.Configuration);
 
 var app = builder.Build();
 
-app.UseMiddleware<ExceptionMiddleware>();
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapAuthEndpoints();
-app.MapUsersEndpoints();
+await app.Configure();
 
 app.Run();

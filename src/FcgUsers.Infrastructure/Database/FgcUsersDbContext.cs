@@ -5,7 +5,7 @@ namespace FcgUsers.Infrastructure.Database;
 
 public class FcgUsersDbContext(DbContextOptions<FcgUsersDbContext> options) : DbContext(options)
 {
-    public DbSet<User> Users => Set<User>();
+    public DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
         => modelBuilder.ApplyConfigurationsFromAssembly(typeof(FcgUsersDbContext).Assembly);
