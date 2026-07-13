@@ -58,13 +58,3 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/fcg-users-api:${{ steps.version.outputs.version }}
             ${{ secrets.DOCKERHUB_USERNAME }}/fcg-users-api:latest
-
-      - name: 🚀 Build & Push Worker
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./src/FcgUsers.Worker/Dockerfile
-          push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/fcg-users-worker:${{ steps.version.outputs.version }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/fcg-users-worker:latest
