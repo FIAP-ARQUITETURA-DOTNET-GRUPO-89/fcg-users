@@ -1,61 +1,63 @@
-using Aspire.Hosting;
+﻿using Aspire.Hosting;
 using Aspire.Hosting.Testing;
+using FcgUsers.Application.Interfaces;
 using FcgUsers.Infrastructure.Database;
+using FcgUsers.Infrastructure.Services;
 using FcgUsers.IntegrationTests.TestHelpers;
 using FcgUsers.SharedKernel.Settings;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 
 namespace FcgUsers.IntegrationTests.Fixtures;
 
-/// <summary>
-/// Fixture base para testes de integração da aplicação.
-/// Essa classe atua como ponto central de orquestração da infraestrutura de testes.
-/// </summary>
 public class IntegrationTestFixture : IAsyncLifetime
 {
     public DistributedApplication App { get; private set; } = default!;
-
     private TestDatabaseManager _dbManager = default!;
     private string _connectionString = string.Empty;
 
-    /// <summary>
-    /// Inicializa o ambiente de testes.
-    /// </summary>
     public async ValueTask InitializeAsync()
     {
         Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", "Testing");
 
-        var builder = await DistributedApplicationTestingBuilder
-            .CreateAsync<Projects.FcgUsers_AppHost>();
+        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.FcgUsers_AppHost>();
 
-        builder.Services.AddHttpContextAccessor();
+        var configPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.Testing.json");
+        builder.Configuration.AddJsonFile(configPath, optional: false, reloadOnChange: true);
 
         builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
-        builder.Services.AddSingleton<JwtTestTokenGenerator>();
+        builder.Services.AddScoped<ITokenService, TokenService>();
+        builder.Services.AddHttpContextAccessor();
 
-        builder.Services.ConfigureHttpClientDefaults(client =>
+        builder.Services.AddMassTransitTestHarness(x =>
         {
-            client.ConfigurePrimaryHttpMessageHandler(() =>
-                new HttpClientHandler
-                {
-                    ServerCertificateCustomValidationCallback =
-                        HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-                });
+            x.UsingInMemory((context, cfg) => cfg.ConfigureEndpoints(context));
         });
 
         App = await builder.BuildAsync();
         await App.StartAsync();
 
-        _connectionString = await App.GetConnectionStringAsync("Default") ?? throw new InvalidOperationException("Connection string não encontrada");
+        _connectionString = await App.GetConnectionStringAsync("Default")
+            ?? throw new InvalidOperationException("Connection string 'Default' não encontrada.");
+
         _dbManager = new TestDatabaseManager(_connectionString);
         await _dbManager.InitializeAsync();
         await _dbManager.ResetAsync();
     }
 
-    /// <summary>
-    /// Finaliza a execução da aplicação após os testes.
-    /// </summary>
+    public async Task ResetDatabaseAsync() => await _dbManager.ResetAsync();
+
+    public async Task<T> ExecuteDbContextAsync<T>(Func<FcgUsersDbContext, Task<T>> action)
+    {
+        var options = new DbContextOptionsBuilder<FcgUsersDbContext>().UseNpgsql(_connectionString).Options;
+        await using var context = new FcgUsersDbContext(options);
+        return await action(context);
+    }
+
+    public HttpClient CreateClient() => App.CreateHttpClient("fcgusers-api", endpointName: "https");
+
     public async ValueTask DisposeAsync()
     {
         if (App is not null)
@@ -63,30 +65,5 @@ public class IntegrationTestFixture : IAsyncLifetime
             await App.StopAsync();
             await App.DisposeAsync();
         }
-    }
-
-    /// <summary>
-    /// Reseta o banco de dados para um estado limpo.
-    /// </summary>
-    public async Task ResetDatabaseAsync()
-        => await _dbManager.ResetAsync();
-
-    /// <summary>
-    /// Cria um HttpClient configurado para comunicação com a API.
-    /// </summary>
-    public HttpClient CreateClient()
-        => App.CreateHttpClient("fcgusers-api", endpointName: "https");
-
-    /// <summary>
-    /// Executa uma função isolada utilizando um <see cref="FcgUsersDbContext"/> apontando para o banco de testes.
-    /// </summary>
-    public async Task<T> ExecuteDbContextAsync<T>(Func<FcgUsersDbContext, Task<T>> action)
-    {
-        var options = new DbContextOptionsBuilder<FcgUsersDbContext>()
-            .UseNpgsql(_connectionString)
-            .Options;
-
-        await using var context = new FcgUsersDbContext(options);
-        return await action(context);
     }
 }

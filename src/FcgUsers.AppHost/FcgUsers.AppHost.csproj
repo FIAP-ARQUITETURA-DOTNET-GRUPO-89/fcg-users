@@ -14,7 +14,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FcgUsers.Api\FcgUsers.Api.csproj" />
-    <ProjectReference Include="..\FcgUsers.Worker\FcgUsers.Worker.csproj" />
   </ItemGroup>
 
   <ItemGroup>

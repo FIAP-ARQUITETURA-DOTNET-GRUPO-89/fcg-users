@@ -2,7 +2,6 @@
   <Folder Name="/1 - Presentation/">
     <Project Path="src/FcgUsers.Api/FcgUsers.Api.csproj" Id="9a9b1e39-97e8-439a-af5f-8d94cfddd9c7" />
     <Project Path="src/FcgUsers.AppHost/FcgUsers.AppHost.csproj" Id="a71f6d52-711e-4fef-b8d8-3741af06655d" />
-    <Project Path="src/FcgUsers.Worker/FcgUsers.Worker.csproj" />
   </Folder>
   <Folder Name="/2 - Application/">
     <Project Path="src/FcgUsers.Application/FcgUsers.Application.csproj" Id="010342cb-876d-4d71-9064-2fc4780ed5fc" />

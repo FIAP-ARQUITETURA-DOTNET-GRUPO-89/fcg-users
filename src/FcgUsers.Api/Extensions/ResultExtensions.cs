@@ -1,4 +1,4 @@
-using OperationResult;
+﻿using OperationResult;
 
 namespace FcgUsers.Api.Extensions;
 

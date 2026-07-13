@@ -1,4 +1,4 @@
-using FcgUsers.Infrastructure.Database;
+﻿using FcgUsers.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using Respawn;

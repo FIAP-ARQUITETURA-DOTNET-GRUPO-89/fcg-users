@@ -1,4 +1,4 @@
-using FcgUsers.Infrastructure.Database;
+﻿using FcgUsers.Infrastructure.Database;
 using FcgUsers.IoC;
 using Microsoft.OpenApi;
 
@@ -30,7 +30,6 @@ public static class ConfigureServicesExtensions
         });
 
         services.ConfigureAppDependencies(configuration);
-
         services.AddHealthChecks().AddDbContextCheck<FcgUsersDbContext>();
     }
 }
