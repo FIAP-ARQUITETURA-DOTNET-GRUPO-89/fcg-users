@@ -1,0 +1,97 @@
+services:
+
+  postgres:
+    image: postgres:17
+    container_name: fcgusers-postgres
+    environment:
+      POSTGRES_DB: fcgusers
+      POSTGRES_USER: fcgusers
+      POSTGRES_PASSWORD: fcgusers
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fcgusers -d fcgusers"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - fcgusers-network
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: fcgusers-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - fcgusers-network
+
+  api:
+    build:
+      context: .
+      dockerfile: src/FcgUsers.Api/Dockerfile
+    container_name: fcgusers-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - "7072:7072"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:7072
+      ConnectionStrings__Default: Host=postgres;Port=5432;Database=fcgusers;Username=fcgusers;Password=fcgusers
+      ConnectionStrings__Rabbitmq: amqp://guest:guest@rabbitmq:5672
+      JwtSettings__Issuer: FcgUsers-Issuer
+      JwtSettings__SecurityKey: FcgUsers_Secret_Key_2026_High_Security_Token
+      JwtSettings__ExpirationHours: 2
+      Serilog__MinimumLevel__Default: Information
+    restart: unless-stopped
+    networks:
+      - fcgusers-network
+
+  worker:
+    build:
+      context: .
+      dockerfile: src/FcgUsers.Worker/Dockerfile
+    container_name: fcgusers-worker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__Default: Host=postgres;Port=5432;Database=fcgusers;Username=fcgusers;Password=fcgusers
+      ConnectionStrings__Rabbitmq: amqp://guest:guest@rabbitmq:5672
+      MassTransit__RetryLimit: 5
+      MassTransit__MinIntervalSeconds: 1
+      MassTransit__MaxIntervalSeconds: 30
+      MassTransit__IntervalDeltaSeconds: 2
+      Serilog__MinimumLevel__Default: Information
+      Serilog__WriteTo__0__Args__path: /app/logs/fcgusers-worker-log-.txt
+    volumes:
+      - worker_logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - fcgusers-network
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
+  worker_logs:
+networks:
+  fcgusers-network:
+    driver: bridge

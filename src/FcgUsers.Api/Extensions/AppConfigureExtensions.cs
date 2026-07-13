@@ -14,16 +14,18 @@ public static class AppConfigureExtensions
         app.UseMiddleware<ExceptionMiddleware>();
         app.UseHttpsRedirection();
 
-
-        app.UseSwagger();
-        app.UseSwaggerUI(c =>
+        if (app.Environment.IsDevelopment())
         {
-            c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
-            c.RoutePrefix = "";
-        });
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
+                c.RoutePrefix = "";
+            });
+        }
 
         var runMigration = app.Environment.IsDevelopment() ||
-                   (app.Environment.IsProduction() && Environment.GetEnvironmentVariable("RUN_MIGRATION") == "true");
+                           (app.Environment.IsProduction() && Environment.GetEnvironmentVariable("RUN_MIGRATION") == "true");
 
         if (runMigration)
         {
