@@ -1,308 +1,229 @@
-# 🚀 FcgUsers
+# 🚀 FcgUsers API
 
-Template de API desenvolvido com **ArchForge**, uma CLI para geração de projetos .NET padronizados.
+Serviço core de gerenciamento de usuários da plataforma **FCG Games**. Este microsserviço é responsável pelo ciclo de vida completo do usuário, incluindo registro, autenticação, controle de permissões (RBAC) e propagação assíncrona de eventos de domínio.
 
-O objetivo do ArchForge é acelerar a criação de novos serviços, eliminando tarefas repetitivas de configuração e fornecendo uma estrutura consistente, testável e pronta para evolução.
+---
 
 ## 📑 Sumário
 
+- [👁 Visão Geral](#-visão-geral)
 - [📋 Tecnologias Utilizadas](#-tecnologias-utilizadas)
 - [🏛 Arquitetura](#-arquitetura)
 - [📁 Estrutura da Solução](#-estrutura-da-solução)
+- [🔄 Fluxo de Eventos (Mensageria)](#-fluxo-de-eventos-mensageria)
+- [⚙️ Pré-requisitos](#️-pré-requisitos)
 - [▶️ Executando Localmente](#️-executando-localmente)
 - [🗄 Banco de Dados](#-banco-de-dados)
 - [🔐 Autenticação JWT](#-autenticação-jwt)
-  - [Gerando Token Manualmente](#gerando-token-manualmente)
-  - [Policies Disponíveis](#policies-disponíveis)
-- [📡 Coleção Postman](#-coleção-postman)
-- [🧪 Executando Testes](#-executando-testes)
-- [📚 Documentação](#-documentação)
-  - [ADRs](#adrs)
-  - [Diagramas](#diagramas)
-  - [Linguagem Ubíqua](#linguagem-ubíqua)
-- [🎯 Objetivos do Template](#-objetivos-do-template)
+- [🧪 Testes](#-testes)
+- [🌍 Variáveis de Ambiente](#-variáveis-de-ambiente)
+
+---
+
+## 👁 Visão Geral
+
+O **FcgUsers API** provê a identidade e gestão de perfis dentro do ecossistema FCG Games.
+
+A aplicação utiliza o padrão **CQRS** com **MediatR** para desacoplar comandos de escrita de consultas de leitura, promovendo maior organização, escalabilidade e facilidade de manutenção.
+
+Além disso, adota **DDD (Domain-Driven Design)** e **Clean Architecture**, separando claramente regras de negócio, infraestrutura e apresentação.
+
+---
 
 ## 📋 Tecnologias Utilizadas
 
-- .NET 10
-- ASP.NET Core Minimal API
-- .NET Aspire
-- MediatR
-- FluentValidation
-- Mapperly
-- Entity Framework Core
-- PostgreSQL
-- JWT Authentication
-- Health Checks
-- Serilog
-- xUnit
-- Shouldly
-- NSubstitute
-- Aspire Testing
-- Respawn
+| Categoria | Tecnologia |
+| :--- | :--- |
+| **Runtime** | .NET 10 |
+| **API** | ASP.NET Core Minimal API |
+| **Orquestração** | .NET Aspire (Local e Cloud Ready) |
+| **Mensageria** | MassTransit + RabbitMQ |
+| **Persistência** | Entity Framework Core + PostgreSQL |
+| **Mediação** | MediatR + CQRS + OperationResult |
+| **Validação** | FluentValidation (via `ValidationBehavior`) |
+| **Segurança** | JWT Bearer + BCrypt |
+| **Testes** | xUnit, Shouldly, Respawn e Testcontainers |
+
+---
 
 ## 🏛 Arquitetura
 
-Este template segue princípios de:
+O projeto segue os princípios de **Clean Architecture** e **DDD**, organizando o código em camadas bem definidas.
 
-- Clean Architecture
-- Domain-Driven Design (DDD)
-- CQRS
-- SOLID
-- Separation of Concerns
+| Camada | Responsabilidade |
+| :--- | :--- |
+| `FcgUsers.Api` | Endpoints, Middlewares e Filtros de Validação |
+| `FcgUsers.Application` | Casos de Uso, Commands, Queries, Handlers e Mappers |
+| `FcgUsers.Domain` | Agregados (`User`), Value Objects (`Email`, `Password`), Interfaces e Regras de Negócio |
+| `FcgUsers.Infrastructure` | Persistência, EF Core, Migrations e Mensageria |
+| `FcgUsers.IoC` | Registro de Dependências |
+| `FcgUsers.ServiceDefaults` | Configurações compartilhadas do Aspire (Health Checks, OTEL etc.) |
+| `FcgUsers.SharedKernel` | Componentes reutilizáveis, Behaviors, Validators e Configurações |
 
-### Camadas
-
-| Projeto                    | Responsabilidade                                       |
-| -------------------------- | ------------------------------------------------------ |
-| FcgUsers.Api             | Endpoints, Middlewares e Configurações                 |
-| FcgUsers.Application     | Casos de uso, Commands, Queries, Validators e Handlers |
-| FcgUsers.Domain          | Entidades, Regras de Negócio e Contratos               |
-| FcgUsers.Infrastructure  | Persistência, EF Core e Repositórios                   |
-| FcgUsers.IoC             | Registro de dependências                               |
-| FcgUsers.SharedKernel    | Componentes compartilhados                             |
-| FcgUsers.ServiceDefaults | Configurações compartilhadas Aspire                    |
-| FcgUsers.AppHost         | Orquestração Aspire                                    |
+---
 
 ## 📁 Estrutura da Solução
 
 ```text
 src/
-├── FcgUsers.Api
-├── FcgUsers.AppHost
-├── FcgUsers.Application
-├── FcgUsers.Domain
-├── FcgUsers.Infrastructure
-├── FcgUsers.IoC
-├── FcgUsers.ServiceDefaults
-└── FcgUsers.SharedKernel
+├── FcgUsers.Api              # Entry Point da API
+├── FcgUsers.AppHost          # Orquestração com .NET Aspire
+├── FcgUsers.Application      # Casos de uso e Handlers
+├── FcgUsers.Domain           # Entidades e regras de negócio
+├── FcgUsers.Infrastructure   # Persistência e Mensageria
+├── FcgUsers.IoC              # Injeção de Dependências
+├── FcgUsers.ServiceDefaults  # Configurações compartilhadas do Aspire
+└── FcgUsers.SharedKernel     # Código compartilhado
 
 tests/
-├── FcgUsers.UnitTests
-└── FcgUsers.IntegrationTests
-
-docs/
-├── adrs
-├── api-collection
-├── diagrams
-└── linguagem-ubiqua
+├── FcgUsers.UnitTests         # Testes de domínio
+└── FcgUsers.IntegrationTests  # Testes de integração
 ```
+
+---
+
+## 🔄 Fluxo de Eventos (Mensageria)
+
+A API atua como um **publicador de eventos de domínio**, permitindo que outros microsserviços reajam às alterações realizadas nos usuários.
+
+### Evento publicado
+
+- `UserCreatedEvent`
+
+### Broker
+
+- RabbitMQ
+
+### Framework
+
+- MassTransit
+
+### Resiliência
+
+A mensageria utiliza **Retry Policy exponencial**, configurada através de `MassTransitSettings`, garantindo reprocessamento automático em caso de falhas temporárias.
+
+---
+
+## ⚙️ Pré-requisitos
+
+Antes de executar a aplicação, instale:
+
+- .NET SDK 10.0 ou superior
+- Docker Desktop
+- Workload do Aspire
+
+Instalação do Aspire:
+
+```bash
+dotnet workload install aspire
+```
+
+---
 
 ## ▶️ Executando Localmente
 
-### Restaurar dependências
+O ambiente completo é provisionado automaticamente pelo **.NET Aspire**.
 
-```bash
-dotnet restore
-```
-
-### Compilar
-
-```bash
-dotnet build
-```
-
-### Executar com Aspire
+Execute:
 
 ```bash
 dotnet run --project src/FcgUsers.AppHost
 ```
 
-### Executar apenas a API
+Após iniciar a aplicação, o **Aspire Dashboard** será aberto automaticamente, exibindo:
 
-```bash
-dotnet run --project src/FcgUsers.Api
-```
+- Logs
+- Métricas
+- Status dos containers
+  - PostgreSQL
+  - RabbitMQ
+
+---
 
 ## 🗄 Banco de Dados
 
-Criar migration:
+A persistência utiliza **Entity Framework Core** com PostgreSQL.
+
+A conexão possui estratégia de **Retry on Failure**, aumentando a resiliência em falhas temporárias.
+
+### Criar uma Migration
 
 ```bash
-dotnet ef migrations add MinhaMigration -p src/FcgUsers.Infrastructure -s src/FcgUsers.Api --output-dir Database/Migrations
+dotnet ef migrations add NomeDaMigration -p src/FcgUsers.Infrastructure -s src/FcgUsers.Api
 ```
 
-Aplicar migrations:
-
-```bash
-dotnet ef database update -p src/FcgUsers.Infrastructure -s src/FcgUsers.Api
-```
+---
 
 ## 🔐 Autenticação JWT
 
-O template já possui autenticação JWT configurada.
+A API utiliza autenticação baseada em **JWT Bearer**.
 
-Configuração padrão:
+As configurações são validadas em tempo de inicialização através do método `ValidateOnStart()`.
 
-```json
-"JwtSettings": {
-    "Issuer": "FcgUsers-Issuer",
-    "SecurityKey": "FcgUsers_Secret_Key_2026_High_Security_Token",
-    "ExpirationHours": 2
-}
-```
+### Validações
 
-### Gerando Token Manualmente
+- Issuer
+- SecurityKey
 
-Acesse:
+### Política
 
-🌐 https://jwt.io
+- `AdminPolicy` — Restringe endpoints administrativos.
 
-#### Header
-
-```json
-{
-  "alg": "HS256",
-  "typ": "JWT"
-}
-```
-
-#### Payload para perfil Admin
-
-```json
-{
-  "iss": "FcgUsers-Issuer",
-  "sub": "1",
-  "name": "Administrador",
-  "role": "Admin",
-  "exp": 1893456000
-}
-```
-
-#### Payload para perfil Customer
-
-```json
-{
-  "iss": "FcgUsers-Issuer",
-  "sub": "2",
-  "name": "Cliente",
-  "role": "Customer",
-  "exp": 1893456000
-}
-```
-
-#### Secret
-
-```text
-FcgUsers_Secret_Key_2026_High_Security_Token
-```
-
-Após gerar o token, utilize:
+### Header
 
 ```http
 Authorization: Bearer {TOKEN}
 ```
 
-### Policies Disponíveis
+---
 
-| Policy         | Roles Permitidas |
-| -------------- | ---------------- |
-| CustomerPolicy | Admin, Customer  |
-| AdminPolicy    | Admin            |
+## 🧪 Testes
 
-## 📡 Coleção Postman
+### Testes Unitários
 
-A coleção da API está disponível em:
+Responsáveis por validar a lógica das entidades de domínio:
 
-```text
-docs/api-collection/
-```
+- User
+- Password
+- Email
 
-Importe o arquivo `.json` no Postman para iniciar os testes rapidamente.
-
-## 🧪 Executando Testes
-
-### Todos os testes
-
-```bash
-dotnet test
-```
-
-### Unitários
+Execute:
 
 ```bash
 dotnet test tests/FcgUsers.UnitTests
 ```
 
-### Integração
+---
+
+### Testes de Integração
+
+Os testes utilizam:
+
+- IntegrationTestFixture
+- Respawn
+- Testcontainers
+
+Antes da execução de cada teste, o banco é restaurado automaticamente utilizando **Respawn**, garantindo isolamento total entre os cenários.
+
+Execute:
 
 ```bash
 dotnet test tests/FcgUsers.IntegrationTests
 ```
 
-## 📊 Cobertura de Testes
+---
 
-O template já possui suporte à geração de cobertura de testes utilizando Coverlet.
+## 🌍 Variáveis de Ambiente (Aspire Managed)
 
-### Gerar cobertura dos testes unitários
+| Variável | Descrição |
+| :--- | :--- |
+| `ConnectionStrings:Default` | String de conexão com PostgreSQL |
+| `ConnectionStrings:rabbitmq` | Endereço do RabbitMQ |
+| `JwtSettings:SecurityKey` | Chave secreta utilizada para assinatura dos tokens JWT |
+| `MassTransit:RetryLimit` | Quantidade máxima de tentativas de reprocessamento (Padrão: **5**) |
 
-```bash
-dotnet test tests/FcgUsers.UnitTests --collect:"XPlat Code Coverage" --settings .runsettings
-```
+---
 
-### Instalar o ReportGenerator
+## 📄 Licença
 
-Caso ainda não possua a ferramenta instalada:
-
-```bash
-dotnet tool install -g dotnet-reportgenerator-globaltool
-```
-
-### Gerar relatório HTML
-
-```bash
-reportgenerator -reports:"**/coverage.cobertura.xml" -targetdir:"coverage-report" -reporttypes:"Html;MarkdownSummary"
-```
-
-### Visualizar relatório
-
-Abra o arquivo:
-
-```text
-coverage-report/index.html
-```
-
-## 📚 Documentação
-
-A documentação do projeto fica centralizada na pasta:
-
-```text
-docs/
-```
-
-### ADRs
-
-```text
-docs/adrs
-```
-
-Registro das decisões arquiteturais.
-
-### Diagramas
-
-```text
-docs/diagrams
-```
-
-Diagramas de arquitetura e fluxo.
-
-### Linguagem Ubíqua
-
-```text
-docs/linguagem-ubiqua
-```
-
-Glossário do domínio.
-
-## 🎯 Objetivos do Template
-
-Este template foi criado para fornecer:
-
-- Estrutura pronta
-- Padronização entre serviços
-- Alta cobertura de testes
-- Baixo tempo de setup
-- Facilidade de manutenção
-- Evolução arquitetural consistente
-
-Gerado com ❤️ utilizando ArchForge.
+Projeto desenvolvido para a plataforma **FCG Games**.
