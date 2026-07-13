@@ -1,6 +1,8 @@
-﻿namespace FcgUsers.Application.Interfaces;
+﻿using FcgUsers.Domain.Entities;
+
+namespace FcgUsers.Application.Interfaces;
 
 public interface ITokenService
 {
-    string GenerateJwtToken(string email, string role);
+    string GenerateJwtToken(User user);
 }

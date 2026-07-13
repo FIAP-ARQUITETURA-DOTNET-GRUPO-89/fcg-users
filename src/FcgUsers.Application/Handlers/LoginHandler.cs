@@ -38,7 +38,7 @@ public sealed partial class LoginHandler(
             return Result.Error<LoginResponse>(new UnauthorizedAccessException("Credenciais inválidas."));
         }
 
-        var token = tokenService.GenerateJwtToken(user.Email.Address, user.Role.ToString());
+        var token = tokenService.GenerateJwtToken(user);
 
         LogLoginSuccess(logger, user.Id);
 

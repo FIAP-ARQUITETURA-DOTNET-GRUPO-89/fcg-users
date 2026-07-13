@@ -1,4 +1,4 @@
-namespace FcgUsers.Domain.Entities;
+﻿namespace FcgUsers.Domain.Entities;
 
 public abstract class BaseEntity
 {
@@ -16,6 +16,7 @@ public abstract class BaseEntity
 
     protected void MarkAsUpdated() => UpdatedAt = DateTime.UtcNow;
 
+    internal void SetId(Guid id) => Id = id;
 
     public override bool Equals(object? obj)
     {

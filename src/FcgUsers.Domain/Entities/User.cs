@@ -19,17 +19,20 @@ public class User : BaseEntity, IAggregateRoot
         Password = null!;
     }
 
-    public User(string name, DateOnly birthDate, Email email, Password password, UserRole userRole)
+    public User(Guid id, string name, DateOnly birthDate, Email email, Password password, UserRole role)
     {
-        Id = Guid.NewGuid();
+        Id = id;
         CreatedAt = DateTime.UtcNow;
         Name = name;
         BirthDate = birthDate;
         Email = email;
         Password = password;
-        Role = userRole;
+        Role = role;
         IsInactive = false;
     }
+
+    public User(string name, DateOnly birthDate, Email email, Password password, UserRole userRole)
+        : this(Guid.NewGuid(), name, birthDate, email, password, userRole) { }
 
     public void UpdateProfile(string name, DateOnly birthDate)
     {
