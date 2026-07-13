@@ -1,6 +1,8 @@
 ﻿using FcgUsers.Api.Endpoints;
 using FcgUsers.Api.Middlewares;
+using FcgUsers.Application.Interfaces;
 using FcgUsers.Infrastructure.Database;
+using FcgUsers.Infrastructure.Seed;
 using Microsoft.EntityFrameworkCore;
 
 namespace FcgUsers.Api.Extensions;
@@ -30,16 +32,19 @@ public static class AppConfigureExtensions
             using var scope = app.Services.CreateScope();
 
             var db = scope.ServiceProvider.GetRequiredService<FcgUsersDbContext>();
+            var senhaHasher = scope.ServiceProvider.GetRequiredService<ISenhaHasherService>();
             if (db.Database.IsRelational())
             {
                 db.Database.Migrate();
+                await DevDatabaseSeeder.SeedAsync(db, senhaHasher);
             }
         }
 
         app.UseAuthentication();
         app.UseAuthorization();
 
-        app.MapOrdersEndpoints();
+        app.MapAuthEndpoints();
+        app.MapUsersEndpoints();
 
         app.MapHealthChecks("/health");
         app.MapHealthChecks("/ready");

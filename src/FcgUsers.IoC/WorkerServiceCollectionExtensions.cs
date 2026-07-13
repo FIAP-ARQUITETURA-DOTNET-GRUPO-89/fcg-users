@@ -1,8 +1,10 @@
-using FcgUsers.Application;
+﻿using FcgUsers.Application;
 using FcgUsers.Domain;
-using FcgUsers.Domain.Repositories.Orders;
+using FcgUsers.Domain.Repositories;
 using FcgUsers.Infrastructure.Database;
-using FcgUsers.Infrastructure.Repositories.Orders;
+using FcgUsers.Infrastructure.Repositories;
+using FcgUsers.Infrastructure.Services;
+using FcgUsers.Application.Interfaces;
 using FcgUsers.SharedKernel.Behaviors;
 using FcgUsers.SharedKernel.Settings;
 using Microsoft.EntityFrameworkCore;
@@ -26,14 +28,16 @@ public static class WorkerServiceCollectionExtensions
                 typeof(ValidationBehavior<,>).Assembly)
         );
 
-        //Banco
+        // Banco
         services.AddDbContext<FcgUsersDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("Default"),
                 npgsql => npgsql.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(10), errorCodesToAdd: null)));
 
         // Repositories
-        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
 
         // Services
+        services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<ISenhaHasherService, SenhaHasherService>();
     }
 }

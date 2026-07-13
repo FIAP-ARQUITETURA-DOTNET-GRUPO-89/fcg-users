@@ -1,4 +1,4 @@
-using FcgUsers.Api.Extensions;
+﻿using FcgUsers.Api.Extensions;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,10 +7,9 @@ builder.AddServiceDefaults();
 
 builder.Host.UseSerilog((context, services, configuration) =>
 {
-    configuration
-        .ReadFrom.Configuration(context.Configuration)
-        .ReadFrom.Services(services)
-        .Enrich.FromLogContext();
+    configuration.ReadFrom.Configuration(context.Configuration)
+                 .ReadFrom.Services(services)
+                 .Enrich.FromLogContext();
 });
 
 builder.Services.ConfigureServices(builder.Configuration);
