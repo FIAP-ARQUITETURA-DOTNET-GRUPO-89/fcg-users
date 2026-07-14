@@ -1,12 +1,12 @@
-﻿using FcgUsers.Application.Mappers.Users;
+﻿using FcgUsers.Application.Commands;
+using FcgUsers.Application.Mappers.Users;
 using FcgUsers.Application.Responses.Users;
 using FcgUsers.Domain.Repositories;
-using FcgUsers.Domain.Events;
+using FgcGames.EventContracts.Events;
 using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using OperationResult;
-using FcgUsers.Application.Commands;
 
 namespace FcgUsers.Application.Handlers.Users;
 

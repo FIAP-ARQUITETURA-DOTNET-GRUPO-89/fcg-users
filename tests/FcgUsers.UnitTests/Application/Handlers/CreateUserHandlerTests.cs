@@ -1,8 +1,8 @@
 ﻿using FcgUsers.Application.Commands;
 using FcgUsers.Application.Handlers.Users;
 using FcgUsers.Domain.Entities;
-using FcgUsers.Domain.Events;
 using FcgUsers.Domain.Repositories;
+using FgcGames.EventContracts.Events;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
