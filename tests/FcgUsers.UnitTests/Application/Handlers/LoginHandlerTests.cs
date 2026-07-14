@@ -37,7 +37,8 @@ public class LoginHandlerTests
         var user = CreateUser(email, passwordHash);
 
         _userRepository.GetByEmailAsync(email).Returns(user);
-        _tokenService.GenerateJwtToken(email, Arg.Any<string>()).Returns("fake-jwt-token");
+
+        _tokenService.GenerateJwtToken(user).Returns("fake-jwt-token");
 
         // Act
         var result = await _sut.Handle(command, CancellationToken.None);

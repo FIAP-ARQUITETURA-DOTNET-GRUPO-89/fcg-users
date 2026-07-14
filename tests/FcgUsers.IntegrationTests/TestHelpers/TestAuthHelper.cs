@@ -51,4 +51,3 @@ public static class TestAuthHelper
     public static HttpClient CreateAnonymousClient(IntegrationTestFixture fixture)
         => fixture.CreateClient();
 }
-}
