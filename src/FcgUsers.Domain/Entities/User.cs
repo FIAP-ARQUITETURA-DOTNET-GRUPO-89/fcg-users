@@ -6,7 +6,6 @@ namespace FcgUsers.Domain.Entities;
 
 public class User : BaseEntity, IAggregateRoot
 {
-    public DateTime CreatedAt { get; private set; }
     public string Name { get; private set; } = string.Empty;
     public DateOnly BirthDate { get; private set; }
     public Email Email { get; private set; }
@@ -20,25 +19,32 @@ public class User : BaseEntity, IAggregateRoot
         Password = null!;
     }
 
-    public User(string name, DateOnly birthDate, Email email, Password password, UserRole userRole)
+    public User(Guid id, string name, DateOnly birthDate, Email email, Password password, UserRole role)
     {
-        Id = Guid.NewGuid();
+        Id = id;
         CreatedAt = DateTime.UtcNow;
         Name = name;
         BirthDate = birthDate;
         Email = email;
         Password = password;
-        Role = userRole;
+        Role = role;
         IsInactive = false;
     }
+
+    public User(string name, DateOnly birthDate, Email email, Password password, UserRole userRole)
+        : this(Guid.NewGuid(), name, birthDate, email, password, userRole) { }
 
     public void UpdateProfile(string name, DateOnly birthDate)
     {
         if (string.IsNullOrWhiteSpace(name))
+        {
             throw new ArgumentException("Name cannot be empty.");
+        }
 
         if (birthDate > DateOnly.FromDateTime(DateTime.Now))
+        {
             throw new ArgumentException("Birth date cannot be a future date.");
+        }
 
         Name = name;
         BirthDate = birthDate;
@@ -62,7 +68,11 @@ public class User : BaseEntity, IAggregateRoot
     {
         var today = DateOnly.FromDateTime(DateTime.Now);
         var age = today.Year - BirthDate.Year;
-        if (BirthDate > today.AddYears(-age)) age--;
+        if (BirthDate > today.AddYears(-age))
+        {
+            age--;
+        }
+
         return age;
     }
 }

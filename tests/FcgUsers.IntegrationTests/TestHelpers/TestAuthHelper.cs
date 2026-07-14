@@ -1,6 +1,6 @@
 ﻿using System.Net.Http.Headers;
+using FcgUsers.Application.Interfaces;
 using FcgUsers.IntegrationTests.Fixtures;
-using FcgUsers.Application.Interfaces; // Importante para achar o ITokenService
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FcgUsers.IntegrationTests.TestHelpers;
@@ -16,31 +16,33 @@ public static class TestAuthHelper
     /// <summary>
     /// Cria um HttpClient autenticado como usuário Admin.
     /// </summary>
-    public static async Task<HttpClient> CreateAdminClientAsync(IntegrationTestFixture fixture)
+    public static Task<HttpClient> CreateAdminClientAsync(IntegrationTestFixture fixture)
     {
         var client = fixture.CreateClient();
         var tokenService = fixture.App.Services.GetRequiredService<ITokenService>();
 
-        var token = tokenService.GenerateJwtToken(AdminEmail, "Admin");
+        var token = tokenService.GenerateJwtToken(TestDataSeeder.Admin);
 
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        client.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", token);
 
-        return client;
+        return Task.FromResult(client);
     }
 
     /// <summary>
     /// Cria um HttpClient autenticado como usuário padrão (User).
     /// </summary>
-    public static async Task<HttpClient> CreateUserCustomerAsync(IntegrationTestFixture fixture)
+    public static Task<HttpClient> CreateUserCustomerAsync(IntegrationTestFixture fixture)
     {
         var client = fixture.CreateClient();
         var tokenService = fixture.App.Services.GetRequiredService<ITokenService>();
 
-        var token = tokenService.GenerateJwtToken(UserEmail, "User");
+        var token = tokenService.GenerateJwtToken(TestDataSeeder.User);
 
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        client.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", token);
 
-        return client;
+        return Task.FromResult(client);
     }
 
     /// <summary>

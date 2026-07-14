@@ -21,7 +21,7 @@ public class UpdateUserIntegrationTests(IntegrationTestFixture fixture) : IAsync
     public async Task Dado_DadosValidos_Quando_AtualizarPerfil_Entao_DevePersistirNomeEBirthDate()
     {
         // Arrange
-        var client = TestAuthHelper.CreateAdminClientAsync(_fixture).Result;
+        var client = await TestAuthHelper.CreateAdminClientAsync(_fixture);
         var userId = Guid.NewGuid();
 
         await _fixture.ExecuteDbContextAsync<bool>(async db => {
@@ -35,7 +35,7 @@ public class UpdateUserIntegrationTests(IntegrationTestFixture fixture) : IAsync
         var command = new { Id = userId, Name = "Nome Novo", BirthDate = "1995-05-05" };
 
         // Act
-        var response = await client.PutAsJsonAsync($"/api/users/{userId}", command);
+        var response = await client.PutAsJsonAsync($"/api/users/{userId}", command, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -67,7 +67,7 @@ public class UpdateUserIntegrationTests(IntegrationTestFixture fixture) : IAsync
         var command = new { RoleName = "User" }; // O ID já está na URL
 
         // Act
-        var response = await client.PatchAsJsonAsync($"/api/users/{adminId}/role", command);
+        var response = await client.PatchAsJsonAsync($"/api/users/{adminId}/role", command, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);

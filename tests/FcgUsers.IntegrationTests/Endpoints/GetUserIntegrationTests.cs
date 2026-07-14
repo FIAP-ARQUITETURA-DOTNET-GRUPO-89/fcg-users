@@ -19,7 +19,6 @@ public class GetUserIntegrationTests(IntegrationTestFixture fixture) : IAsyncLif
     [Fact]
     public async Task Dado_IdExistente_Quando_BuscarPorId_Entao_DeveRetornarUsuarioComSucesso()
     {
-        // Mude de CreateUserCustomerAsync para CreateAdminClientAsync
         var client = await TestAuthHelper.CreateAdminClientAsync(_fixture);
 
         var userId = await _fixture.ExecuteDbContextAsync<Guid>(async db => {
@@ -31,7 +30,7 @@ public class GetUserIntegrationTests(IntegrationTestFixture fixture) : IAsyncLif
             return user.Id;
         });
 
-        var response = await client.GetAsync($"/api/users/{userId}");
+        var response = await client.GetAsync($"/api/users/{userId}", TestContext.Current.CancellationToken);
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 
@@ -40,7 +39,7 @@ public class GetUserIntegrationTests(IntegrationTestFixture fixture) : IAsyncLif
     {
         var client = await TestAuthHelper.CreateAdminClientAsync(_fixture);
 
-        var response = await client.GetAsync($"/api/users/{Guid.NewGuid()}");
+        var response = await client.GetAsync($"/api/users/{Guid.NewGuid()}", TestContext.Current.CancellationToken);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }

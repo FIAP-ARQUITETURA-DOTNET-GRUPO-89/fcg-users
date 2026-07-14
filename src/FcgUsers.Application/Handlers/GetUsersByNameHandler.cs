@@ -21,7 +21,7 @@ public sealed partial class GetUsersByNameHandler(
         if (string.IsNullOrWhiteSpace(request.Name))
         {
             var emptyResponse = new PagedResponse<UserResponse>(
-                Enumerable.Empty<UserResponse>(),
+                [],
                 request.Page,
                 request.PageSize,
                 0
