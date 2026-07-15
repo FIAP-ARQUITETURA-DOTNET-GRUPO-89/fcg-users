@@ -38,7 +38,7 @@ spec:
     spec:
       containers:
         - name: fcg-users-api
-          image: jondamiao/fcg-users-api:1.0.0-preview.3
+          image: jondamiao/fcg-users-api:1.0.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 7010
