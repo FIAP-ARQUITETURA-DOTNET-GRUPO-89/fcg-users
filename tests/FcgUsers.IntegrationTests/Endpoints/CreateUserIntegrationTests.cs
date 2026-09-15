@@ -30,7 +30,7 @@ public class CreateUserIntegrationTests(IntegrationTestFixture fixture) : IAsync
             BirthDate = "1990-05-15",
             Email = "testuser@example.com",
             Password = "Password123!",
-            Role = "User"
+            Role = "Customer"
         };
 
         // Act
@@ -44,7 +44,7 @@ public class CreateUserIntegrationTests(IntegrationTestFixture fixture) : IAsync
             var user = await db.Users.FirstOrDefaultAsync(u => u.Email.Address == "testuser@example.com");
             user.ShouldNotBeNull();
             user.Name.ShouldBe("Test User");
-            user.Role.ToString().ShouldBe("User");
+            user.Role.ToString().ShouldBe("Customer");
             return true;
         });
     }
@@ -63,7 +63,7 @@ public class CreateUserIntegrationTests(IntegrationTestFixture fixture) : IAsync
                 birthDate: new DateOnly(1990, 1, 1),
                 email: Email.Create(targetEmail),
                 password: Password.FromHash("HashedPassword123!"),
-                userRole: UserRole.User
+                userRole: UserRole.Customer
             );
 
             db.Users.Add(existingUser);

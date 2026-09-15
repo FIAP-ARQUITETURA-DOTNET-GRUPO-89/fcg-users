@@ -30,7 +30,7 @@ public class DeleteUserIntegrationTests(IntegrationTestFixture fixture) : IAsync
                 new DateOnly(1990, 1, 1),
                 Email.Create("deletar@teste.com"),
                 Password.FromHash("Password123!"),
-                UserRole.User
+                UserRole.Customer
             );
 
             typeof(User).GetProperty("Id")?.SetValue(user, userId);

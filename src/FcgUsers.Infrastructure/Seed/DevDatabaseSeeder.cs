@@ -43,7 +43,7 @@ public static class DevDatabaseSeeder
                 birthDate: new DateOnly(1995, 1, 1),
                 email: Email.Create("joao.silva@email.com"),
                 password: Password.FromHash(senhaHasher.Hash("Abc!1234")),
-                userRole: UserRole.User
+                userRole: UserRole.Customer
             )
         };
 

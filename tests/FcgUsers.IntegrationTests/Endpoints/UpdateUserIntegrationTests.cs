@@ -25,7 +25,7 @@ public class UpdateUserIntegrationTests(IntegrationTestFixture fixture) : IAsync
         var userId = Guid.NewGuid();
 
         await _fixture.ExecuteDbContextAsync<bool>(async db => {
-            var user = new User("Nome Antigo", new DateOnly(1990, 1, 1), Email.Create("update@teste.com"), Password.FromHash("Password123!"), UserRole.User);
+            var user = new User("Nome Antigo", new DateOnly(1990, 1, 1), Email.Create("update@teste.com"), Password.FromHash("Password123!"), UserRole.Customer);
             typeof(User).GetProperty("Id")?.SetValue(user, userId);
             db.Users.Add(user);
             await db.SaveChangesAsync();

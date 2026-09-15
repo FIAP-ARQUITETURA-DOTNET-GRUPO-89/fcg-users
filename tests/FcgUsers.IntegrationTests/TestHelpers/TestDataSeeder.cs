@@ -13,7 +13,7 @@ public static class TestDataSeeder
         new DateOnly(1990, 1, 1),
         Email.Create("user@fcgusers.com"),
         Password.FromHash("hashedpassword123"),
-        UserRole.User);
+        UserRole.Customer);
 
     public static readonly User Admin = new(
         Guid.Parse("22222222-2222-2222-2222-222222222222"),

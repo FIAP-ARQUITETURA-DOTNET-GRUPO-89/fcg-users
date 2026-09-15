@@ -78,7 +78,7 @@ public static class UsersEndpoints
 
     private static async Task<IResult> CreateUser(CreateUserCommand command, IMediator mediator)
     {
-        var result = await mediator.Send(command with { Role = FcgUsers.Domain.Enums.UserRole.User.ToString() });
+        var result = await mediator.Send(command with { Role = FcgUsers.Domain.Enums.UserRole.Customer.ToString() });
         return result.IsSuccess ? Results.Created($"/api/users/{result.Value!.Id}", result.Value) : Results.BadRequest(result.Exception);
     }
 

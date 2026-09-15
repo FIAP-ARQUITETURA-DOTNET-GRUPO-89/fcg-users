@@ -85,6 +85,6 @@ public class UpdateUserHandlerTests
             new DateOnly(1990, 1, 1),
             Email.Create("teste@teste.com"),
             Password.FromHash("hashedpassword123"),
-            UserRole.User
+            UserRole.Customer
         );
 }

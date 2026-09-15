@@ -69,6 +69,6 @@ public class CreateUserHandlerTests
             BirthDate: new DateOnly(1990, 1, 1),
             Email: "teste@teste.com",
             Password: "Password123!",
-            Role: "User"
+            Role: "Customer"
         );
 }

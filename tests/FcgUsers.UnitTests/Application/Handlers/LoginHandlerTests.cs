@@ -92,6 +92,6 @@ public class LoginHandlerTests
             new DateOnly(1990, 1, 1),
             Email.Create(email),
             Password.FromHash(passwordHash),
-            UserRole.User
+            UserRole.Customer
         );
 }

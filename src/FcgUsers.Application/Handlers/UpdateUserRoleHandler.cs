@@ -31,7 +31,7 @@ public sealed partial class UpdateUserRoleHandler(
             return Result.Error<UpdateUserRoleResponse>(new KeyNotFoundException("Usuário não encontrado."));
         }
 
-        if (user.Role == UserRole.Admin && newRole == UserRole.User)
+        if (user.Role == UserRole.Admin && newRole == UserRole.Customer)
         {
             LogAdminDemotionBlocked(logger, user.Id);
             return Result.Error<UpdateUserRoleResponse>(new InvalidOperationException("Não é permitido rebaixar um administrador."));

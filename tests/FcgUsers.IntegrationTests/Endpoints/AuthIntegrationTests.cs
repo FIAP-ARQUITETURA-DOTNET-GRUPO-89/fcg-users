@@ -30,7 +30,7 @@ public class AuthIntegrationTests(IntegrationTestFixture fixture) : IAsyncLifeti
                 new DateOnly(1990, 1, 1),
                 Email.Create(email),
                 Password.FromHash(BCrypt.Net.BCrypt.HashPassword(passwordRaw)),
-                UserRole.User
+                UserRole.Customer
             );
             db.Users.Add(user);
             await db.SaveChangesAsync();

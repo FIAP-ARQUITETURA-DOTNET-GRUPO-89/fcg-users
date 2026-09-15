@@ -16,7 +16,7 @@ public class UserTests
         // Assert
         user.Name.ShouldBe("Iago Pachiani");
         user.IsInactive.ShouldBeFalse();
-        user.Role.ShouldBe(UserRole.User);
+        user.Role.ShouldBe(UserRole.Customer);
     }
 
     [Fact]
@@ -88,7 +88,7 @@ public class UserTests
     {
         // Arrange
         var nascimento = new DateOnly(1990, 1, 1);
-        var user = new User("Teste", nascimento, Email.Create("a@a.com"), Password.FromHash("pass"), UserRole.User);
+        var user = new User("Teste", nascimento, Email.Create("a@a.com"), Password.FromHash("pass"), UserRole.Customer);
 
         // Act
         var age = user.CalculateAge();
@@ -103,6 +103,6 @@ public class UserTests
             new DateOnly(1990, 1, 1),
             Email.Create("iago@teste.com"),
             Password.FromHash("SenhaSegura123!"),
-            UserRole.User
+            UserRole.Customer
         );
 }

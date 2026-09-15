@@ -29,7 +29,7 @@ public class UpdateUserRoleHandlerTests
         // Arrange
         var userId = Guid.NewGuid();
         var command = new UpdateUserRoleCommand(userId, "Admin");
-        var user = CreateUser(UserRole.User);
+        var user = CreateUser(UserRole.Customer);
 
         _userRepository.GetByIdAsync(userId).Returns(user);
 

@@ -84,6 +84,6 @@ public class UpdatePasswordHandlerTests
             new DateOnly(1990, 1, 1),
             Email.Create(email),
             Password.FromHash(BCrypt.Net.BCrypt.HashPassword("SenhaAntiga123")),
-            UserRole.User
+            UserRole.Customer
         );
 }

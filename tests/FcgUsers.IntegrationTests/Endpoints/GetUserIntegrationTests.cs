@@ -23,7 +23,7 @@ public class GetUserIntegrationTests(IntegrationTestFixture fixture) : IAsyncLif
 
         var userId = await _fixture.ExecuteDbContextAsync<Guid>(async db => {
             var user = new User("Search User", new DateOnly(1990, 1, 1),
-                Email.Create("search@test.com"), Password.FromHash("Password123!"), UserRole.User);
+                Email.Create("search@test.com"), Password.FromHash("Password123!"), UserRole.Customer);
 
             db.Users.Add(user);
             await db.SaveChangesAsync();
