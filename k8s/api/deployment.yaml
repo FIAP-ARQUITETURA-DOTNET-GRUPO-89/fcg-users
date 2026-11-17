@@ -35,7 +35,7 @@ spec:
     spec:
       containers:
         - name: fcg-users-api
-          image: 368379549295.dkr.ecr.us-east-1.amazonaws.com/fcg-users-api:latest
+          image: 368379549295.dkr.ecr.us-east-1.amazonaws.com/fcg-users:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 7010

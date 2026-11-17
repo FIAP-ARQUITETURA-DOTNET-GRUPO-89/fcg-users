@@ -2,7 +2,7 @@ name: 🚀 CD - Users
 
 on:
   workflow_run:
-    workflows: ["🐳 Publish Docker Images"] # Ajustar se o nome do workflow de publish do users for diferente
+    workflows: ["🐳 Publish FcgUsers Images"]
     types:
       - completed
   workflow_dispatch:
@@ -68,6 +68,6 @@ jobs:
           IMAGE_TAG: ${{ steps.set-tag.outputs.IMAGE_TAG }}
         run: |
           kubectl set image deployment/fcg-users-api \
-            fcg-users-api=${{ env.ECR_REGISTRY }}/fcg-users-api:${IMAGE_TAG} \
+            fcg-users-api=${{ env.ECR_REGISTRY }}/fcg-users:${IMAGE_TAG} \
             -n ${{ env.K8S_NAMESPACE }}
           kubectl rollout status deployment/fcg-users-api -n ${{ env.K8S_NAMESPACE }}
