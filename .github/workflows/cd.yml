@@ -1,0 +1,73 @@
+name: 🚀 CD - Users
+
+on:
+  workflow_run:
+    workflows: ["🐳 Publish Docker Images"] # Ajustar se o nome do workflow de publish do users for diferente
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Tag da imagem publicada no ECR (ex: latest ou 4.0.0-preview.0)'
+        required: true
+        default: 'latest'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  EKS_CLUSTER_NAME: fcg-platform
+  K8S_NAMESPACE: fcg-platform
+  ECR_REGISTRY: 368379549295.dkr.ecr.us-east-1.amazonaws.com
+
+jobs:
+  deploy:
+    name: ☸️ Deploy Users API to EKS
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: 📥 Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: 🔑 Autenticar na AWS via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION || env.AWS_REGION }}
+
+      - name: 🏷️ Definir Tag da Imagem
+        id: set-tag
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "IMAGE_TAG=${{ github.event.inputs.image_tag }}" >> "$GITHUB_OUTPUT"
+          else
+            REF_NAME="${{ github.event.workflow_run.head_branch }}"
+            if [[ "$REF_NAME" == v* ]]; then
+              echo "IMAGE_TAG=${REF_NAME#v}" >> "$GITHUB_OUTPUT"
+            else
+              echo "IMAGE_TAG=latest" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: ☸️ Configurar Kubeconfig para o EKS
+        run: |
+          aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+
+      - name: 🏗️ Aplicar Manifests Base (ConfigMap, Secret, Service e Deployment)
+        run: |
+          kubectl apply -f k8s/api/configmap.yaml -n ${{ env.K8S_NAMESPACE }}
+          kubectl apply -f k8s/api/secret.yaml -n ${{ env.K8S_NAMESPACE }}
+          kubectl apply -f k8s/api/service.yaml -n ${{ env.K8S_NAMESPACE }}
+          kubectl apply -f k8s/api/deployment.yaml -n ${{ env.K8S_NAMESPACE }}
+
+      - name: 🔄 Atualizar Deployment no EKS (Users API)
+        env:
+          IMAGE_TAG: ${{ steps.set-tag.outputs.IMAGE_TAG }}
+        run: |
+          kubectl set image deployment/fcg-users-api \
+            fcg-users-api=${{ env.ECR_REGISTRY }}/fcg-users-api:${IMAGE_TAG} \
+            -n ${{ env.K8S_NAMESPACE }}
+          kubectl rollout status deployment/fcg-users-api -n ${{ env.K8S_NAMESPACE }}
