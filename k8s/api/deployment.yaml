@@ -4,7 +4,6 @@ kind: Deployment
 metadata:
   name: fcg-users-api
   namespace: fcg-platform
-
   labels:
     app.kubernetes.io/name: fcg-users-api
     app.kubernetes.io/instance: fcg-users-api
@@ -14,9 +13,7 @@ metadata:
 
 spec:
   replicas: 1
-
   revisionHistoryLimit: 5
-
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -38,8 +35,8 @@ spec:
     spec:
       containers:
         - name: fcg-users-api
-          image: jondamiao/fcg-users-api:4.0.0-preview.0
-          imagePullPolicy: IfNotPresent
+          image: 368379549295.dkr.ecr.us-east-1.amazonaws.com/fcg-users:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 7010
           envFrom:
@@ -48,7 +45,6 @@ spec:
             - secretRef:
                 name: fcg-users-api-secret
           env:
-            # Define se as migrations do EF Core serão executadas no startup da aplicação
             - name: RUN_MIGRATION
               value: "true"
           resources:
