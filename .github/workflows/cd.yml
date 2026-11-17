@@ -1,0 +1,117 @@
+name: 🚀 CD - Users
+
+on:
+  workflow_run:
+    workflows: ["🐳 Publish FcgUsers Images"]
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Tag da imagem publicada no ECR (ex: latest ou 4.0.0-preview.0)'
+        required: true
+        default: 'latest'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  EKS_CLUSTER_NAME: fcg-platform
+  K8S_NAMESPACE: fcg-platform
+  ECR_REGISTRY: 368379549295.dkr.ecr.us-east-1.amazonaws.com
+
+jobs:
+  deploy:
+    name: ☸️ Deploy Users API to EKS
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: 📥 Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: 🔑 Autenticar na AWS via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION || env.AWS_REGION }}
+
+      - name: 🏷️ Definir Tag da Imagem
+        id: set-tag
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "IMAGE_TAG=${{ github.event.inputs.image_tag }}" >> "$GITHUB_OUTPUT"
+          else
+            REF_NAME="${{ github.event.workflow_run.head_branch }}"
+            if [[ "$REF_NAME" == v* ]]; then
+              echo "IMAGE_TAG=${REF_NAME#v}" >> "$GITHUB_OUTPUT"
+            else
+              echo "IMAGE_TAG=latest" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: ☸️ Configurar Kubeconfig para o EKS
+        run: |
+          aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+
+      - name: 🛠️ Instalar dependências (gettext-base para envsubst)
+        run: |
+          sudo apt-get update && sudo apt-get install -y gettext-base
+
+      - name: 🔍 Validar Existência dos Secrets
+        env:
+          POSTGRES_CONNECTION_STRING: ${{ secrets.POSTGRES_CONNECTION_STRING }}
+          RABBITMQ_CONNECTION_STRING: ${{ secrets.RABBITMQ_CONNECTION_STRING }}
+          JWT_SECURITY_KEY: ${{ secrets.JWT_SECURITY_KEY }}
+        run: |
+          echo "Validando se os GitHub Secrets obrigatórios foram preenchidos..."
+          MISSING_VARS=0
+          
+          if [ -z "$POSTGRES_CONNECTION_STRING" ]; then
+            echo "❌ Erro: O secret POSTGRES_CONNECTION_STRING está vazio ou não foi configurado."
+            MISSING_VARS=1
+          fi
+          
+          if [ -z "$RABBITMQ_CONNECTION_STRING" ]; then
+            echo "❌ Erro: O secret RABBITMQ_CONNECTION_STRING está vazio ou não foi configurado."
+            MISSING_VARS=1
+          fi
+          
+          if [ -z "$JWT_SECURITY_KEY" ]; then
+            echo "❌ Erro: O secret JWT_SECURITY_KEY está vazio ou não foi configurado."
+            MISSING_VARS=1
+          fi
+          
+          if [ "$MISSING_VARS" -eq 1 ]; then
+            echo "🚨 Falha na validação dos segredos. Interrompendo o deploy."
+            exit 1
+          fi
+          
+          echo "✅ Todos os secrets obrigatórios estão presentes."
+
+      - name: 🏗️ Aplicar Manifests e Injetar Secrets com Segurança
+        env:
+          POSTGRES_CONNECTION_STRING: ${{ secrets.POSTGRES_CONNECTION_STRING }}
+          RABBITMQ_CONNECTION_STRING: ${{ secrets.RABBITMQ_CONNECTION_STRING }}
+          JWT_SECURITY_KEY: ${{ secrets.JWT_SECURITY_KEY }}
+        run: |
+          # 1. Aplica ConfigMap e Service
+          kubectl apply -f k8s/api/configmap.yaml -n ${{ env.K8S_NAMESPACE }}
+          kubectl apply -f k8s/api/service.yaml -n ${{ env.K8S_NAMESPACE }}
+
+          # 2. Processa o template do secret e aplica ANTES do deployment
+          envsubst < k8s/api/secret.yaml | kubectl apply -f - -n ${{ env.K8S_NAMESPACE }}
+
+          # 3. Aplica o deployment por último garantindo que o Secret já existe
+          kubectl apply -f k8s/api/deployment.yaml -n ${{ env.K8S_NAMESPACE }}
+
+      - name: 🔄 Atualizar Deployment no EKS (Users API)
+        env:
+          IMAGE_TAG: ${{ steps.set-tag.outputs.IMAGE_TAG }}
+        run: |
+          kubectl set image deployment/fcg-users-api \
+            fcg-users-api=${{ env.ECR_REGISTRY }}/fcg-users:${IMAGE_TAG} \
+            -n ${{ env.K8S_NAMESPACE }}
+          kubectl rollout status deployment/fcg-users-api -n ${{ env.K8S_NAMESPACE }}
